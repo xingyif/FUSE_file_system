@@ -136,7 +136,7 @@ nufs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_fi
         len = size;
     }
 
-    strlcpy(buf, data, len);
+    strncpy(buf, data, len);
     return len;
 }
 
