@@ -3,7 +3,7 @@ SRCS := $(wildcard *.c)
 OBJS := $(SRCS:.c=.o)
 HDRS := $(wildcard *.h)
 
-CFLAGS := -g `pkg-config fuse --cflags`
+CFLAGS := -std=c99 -g `pkg-config fuse --cflags`
 LDLIBS := `pkg-config fuse --libs` 
 
 nufs: $(OBJS)
