@@ -1,1 +1,3 @@
 hw 12
+
+brett is setting up git on ubuntu
