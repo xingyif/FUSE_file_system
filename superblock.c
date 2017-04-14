@@ -11,7 +11,6 @@
 #include <stdio.h>
 
 #include "superblock.h"
-#include "util.h"
 //import blocks
 //import pages
 //import inode
@@ -24,7 +23,7 @@ const int PAGE_COUNT = 256;
 void*
 superblock_init()
 {
-	superblock* sprblk = mmap(0, SUPERBLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, -1, 0);
+	superblock *sprblk = mmap(0, SUPERBLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, -1, 0);
     assert(sprblk != 0);
 	
 	sprblk->inode_map_size = PAGE_COUNT;
@@ -37,7 +36,7 @@ superblock_init()
 	sprblk->inodes = NULL; //needs to be overriden
 
 	sprblk->num_of_blocks = PAGE_COUNT;
-	sprblk->blocks = NULL; //needs to be overriden
+//not work	sprblk->blocks = NULL; //needs to be overriden
 	
 	sprblk->root_inode_idx = 0;
 
@@ -47,20 +46,20 @@ superblock_init()
 void
 superblock_free()
 {
-    int rv = munmap(pages_base, NUFS_SIZE);
-    assert(rv == 0);
+   // int rv = munmap(pages_base, NUFS_SIZE);
+   // assert(rv == 0);
 }
 
 void
-print_superblock(superbloc* superblock)
-{
+print_superblock(superblock* superblock)
+{/*
     if (node) {
         printf("node{refs: %d, mode: %04o, size: %d, xtra: %d}\n",
                node->refs, node->mode, node->size, node->xtra);
     }
     else {
         printf("node{null}\n");
-    }
+    }*/
 }
 
 
