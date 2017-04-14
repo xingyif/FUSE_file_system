@@ -18,7 +18,8 @@ static file_data file_table[] = {
 
 void
 storage_init(const char* path)
-{
+{ 
+// superblock_init here
     printf("TODO: Store file system data in: %s\n", path);
 }
 
