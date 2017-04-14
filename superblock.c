@@ -11,28 +11,37 @@
 #include <stdio.h>
 
 #include "superblock.h"
-#include "slist.h"
 #include "util.h"
-
+//import blocks
+//import pages
+//import inode
 // BRETT IS STILL WORKING
 
-const int NUFS_SIZE  = 1024 * 1024; // 1MB
+const int SUPERBLOCK_SIZE  = 1024 * 1024; // 1MB
 const int PAGE_COUNT = 256;
 
-static int   pages_fd   = -1;
-static void* pages_base =  0;
 
-void
-superblock_init(const char* path)
+void*
+superblock_init()
 {
-    pages_fd = open(path, O_CREAT | O_RDWR, 0644);
-    assert(pages_fd != -1);
+	superblock* sprblk = mmap(0, SUPERBLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, -1, 0);
+    assert(sprblk != 0);
+	
+	sprblk->inode_map_size = PAGE_COUNT;
+	sprblk->ibitmap_location = NULL; // needs to be overriden
+	
+	sprblk->block_map_size = PAGE_COUNT;
+	sprblk->bbitmap_location = NULL; // needs to be overridden
 
-    int rv = ftruncate(pages_fd, NUFS_SIZE);
-    assert(rv == 0);
+	sprblk->num_of_inodes = PAGE_COUNT;
+	sprblk->inodes = NULL; //needs to be overriden
 
-    pages_base = mmap(0, NUFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, pages_fd, 0);
-    assert(pages_base != MAP_FAILED);
+	sprblk->num_of_blocks = PAGE_COUNT;
+	sprblk->blocks = NULL; //needs to be overriden
+	
+	sprblk->root_inode_idx = 0;
+
+	return sprblk;	
 }
 
 void
@@ -40,19 +49,6 @@ superblock_free()
 {
     int rv = munmap(pages_base, NUFS_SIZE);
     assert(rv == 0);
-}
-
-int
-pages_find_empty()
-{
-    int pnum = -1;
-    for (int ii = 2; ii < PAGE_COUNT; ++ii) {
-        if (0) { // if page is empty
-            pnum = ii;
-            break;
-        }
-    }
-    return pnum;
 }
 
 void

@@ -1,23 +1,26 @@
 #ifndef SUPERBLOCK_H
 #define SUPERBLOCK_H
 
- Made by Brett 4/13/2017
-
+// Made by Brett 4/13/2017
+// import block.h inode.h pages.h
 #include <stdio.h>
+#include "pages.h"
+#include "blocks.h"
 
 typedef struct superblock {
-uint64_t magic;
-uint64_t inode_map_size; /* in 1024-byte blocks */
-uint64_t inode_region_sz; /* in 1024-byte blocks */
-uint64_t block_map_sz; /* in 1024-byte blocks */
-uint64_t num_blocks; /* total disk size */ 
-uint64_t root_inode; 
-padding[];/* to make size = 1024 */
-} 
+int inode_map_size; // size of inode bitmap
+void* ibitmap_location; // location of inode bitmap
+int block_map_size; // block map size
+void* bbitmap_location; // location of block bitmap
+int num_of_inodes; // number of inodes
+inode inodes; // location to inodes
+int num_of_blocks; // number of blocks
+block blocks; // location to blocks
+int root_inode_idx; //root inode index this is the index of the root directory
 
+} superblock;
 void*   superblock_init();
 void   superblock_free();
-superblock* super_get_block(int block_id);
 void   print_superblock(superblock* superblock);
 
 #endif
