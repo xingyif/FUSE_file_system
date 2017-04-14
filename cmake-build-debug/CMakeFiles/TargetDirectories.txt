@@ -1,3 +1,0 @@
-/Users/yifanxing/Documents/学习/NU Years-2017/Computing Systems/hw12/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/yifanxing/Documents/学习/NU Years-2017/Computing Systems/hw12/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/yifanxing/Documents/学习/NU Years-2017/Computing Systems/hw12/cmake-build-debug/CMakeFiles/hw12.dir
