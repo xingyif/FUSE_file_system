@@ -4,3 +4,8 @@ brett is setting up git on ubuntu
 
 ssh -i "hw12-yifan.pem" ubuntu@ec2-54-237-221-205.compute-1.amazonaws.com
 
+get adir
+make node
+
+echo "hello" > hello.txt
+
