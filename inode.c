@@ -10,8 +10,8 @@
 #include <stdio.h>
 
 #include "inode.h"
-//#include "slist.h"
-//#include "util.h"
+#include "slist.h"
+#include "util.h"
 
 const int NUFS_SIZE  = 1024 * 1024; // 1MB
 const int PAGE_COUNT = 256;
