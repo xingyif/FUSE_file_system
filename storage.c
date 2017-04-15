@@ -1,3 +1,6 @@
+// ATTENTION: this is Nat trying to fake the fs so that the tests run
+// you can ignore the file, and instead make the nufs.c main function call your functions
+// however, this file is a good example of what the fs at least should do
 
 #include <stdio.h>
 #include <string.h>
