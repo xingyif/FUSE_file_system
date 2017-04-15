@@ -1,80 +1,25 @@
-#include <string.h>
-
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <assert.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <stdio.h>
-
 #include "inode.h"
-#include "slist.h"
-#include "util.h"
-
-const int NUFS_SIZE  = 1024 * 1024; // 1MB
-const int PAGE_COUNT = 256;
-
-static int   pages_fd   = -1;
-static void* pages_base =  0;
+#include <sys/stat.h>
+int ROOT_DIR_IDX = 0;
 
 void
-pages_init(const char* path)
-{
-    pages_fd = open(path, O_CREAT | O_RDWR, 0644);
-    assert(pages_fd != -1);
-
-    int rv = ftruncate(pages_fd, NUFS_SIZE);
-    assert(rv == 0);
-
-    pages_base = mmap(0, NUFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, pages_fd, 0);
-    assert(pages_base != MAP_FAILED);
+inode_init(const char *pathname, inode current_inode) {
+//    mode[3];
+    struct stat *buf;
+    stat(pathname, buf);
+    current_inode.mode = buf->st_mode;
+    current_inode.user_id = buf->st_uid;
+    current_inode.size_of = buf->st_size;
+    current_inode.size_of = is_file(pathname); // todo write a function in util to read last 3 char in given path, return 1 for file, 0 for dir
 }
 
-void
-pages_free()
-{
-    int rv = munmap(pages_base, NUFS_SIZE);
-    assert(rv == 0);
-}
-
-void*
-pages_get_inode(int inum)
-{
-    return pages_base + 4096 * inum;
-}
-
-inode*
-pages_get(int node_id)
-{
-    inode* idx = (inode*) pages_get_inode(0);
-	int inum = pages_find_empty();    
-return &(idx[inum]);
-}
-
-int
-pages_find_empty()
-{
-    int pnum = -1;
-    for (int ii = 2; ii < PAGE_COUNT; ++ii) {
-        if (0) { // if page is empty
-            pnum = ii;
-            break;
-        }
+inode
+get_inode(const char *pathname, inode inodes[256], int index) {
+    inode current_inode = inodes[index];
+    // if this is the first time
+    if (current_inode == NULL) {
+        // initialize inode
+        inode_init(current_inode);
     }
-    return pnum;
+    return current_inode;
 }
-
-void
-print_node(inode* node)
-{
-    if (node) {
-        printf("node{refs: %d, mode: %04o, size: %d, xtra: %d}\n",
-               node->refs, node->mode, node->size, node->xtra);
-    }
-    else {
-        printf("node{null}\n");
-    }
-}
-
