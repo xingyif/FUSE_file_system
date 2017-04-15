@@ -12,7 +12,9 @@
 #include <fuse.h>
 
 #include "storage.h"
+#include "superblock.h"
 
+superblock* superblk;
 
 // implementation for: man 2 access
 // Checks if a file exists.
@@ -173,8 +175,13 @@ int
 main(int argc, char *argv[])
 {
     assert(argc > 2);
-    storage_init(argv[--argc]);
-    nufs_init_ops(&nufs_ops);
+if (superblk == NULL) {
+	superblk = superblock_init();
+}
+//	slist* path = split(argv[--argc]); 
+  // storage_init(argv[--argc]);
+//   superblock_add_inode(argv[--argc]);
+	 nufs_init_ops(&nufs_ops);
     return fuse_main(argc, argv, &nufs_ops, NULL);
 }
 
