@@ -4,7 +4,7 @@ OBJS := $(SRCS:.c=.o)
 HDRS := $(wildcard *.h)
 
 CFLAGS := -std=c11 -g `pkg-config fuse --cflags`
-LDLIBS := `pkg-config fuse --libs libbsd` 
+LDLIBS := `pkg-config fuse --libs libbsd` -lbsd
 
 nufs: $(OBJS)
 	gcc $(CLFAGS) -o $@ $^ $(LDLIBS)
