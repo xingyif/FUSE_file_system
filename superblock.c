@@ -14,7 +14,6 @@
 //import blocks
 //import pages
 //import inode
-// BRETT IS STILL WORKING
 
 const int SUPERBLOCK_SIZE  = 1024 * 1024; // 1MB
 const int INODE_COUNT = 256;
@@ -25,11 +24,9 @@ superblock_init()
 {
 	superblock *sprblk = mmap(0, SUPERBLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, -1, 0);
     assert(sprblk != 0);
-	
-	sprblk->inode_map_size = INODE_COUNT;
+
 	sprblk->ibitmap_location = NULL; // needs to be overriden
-	
-	sprblk->block_map_size = INODE_COUNT;
+
 	sprblk->bbitmap_location = NULL; // needs to be overridden
 
 	sprblk->num_of_inodes = INODE_COUNT;
@@ -37,10 +34,10 @@ superblock_init()
 
 	sprblk->num_of_blocks = INODE_COUNT;
 //not work	sprblk->blocks = NULL; //needs to be overriden
-	
+
 	sprblk->root_inode_idx = 0;
 
-	return sprblk;	
+	return sprblk;
 }
 
 void

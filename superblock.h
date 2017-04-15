@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #include "inode.h"
-#include "blocks.h"
+#include "iblock.h"
 
 typedef struct superblock {
 	// int inode_map_size; // size of inode bitmap
@@ -17,7 +17,7 @@ typedef struct superblock {
 	int num_of_inodes; // number of inodes
 	inode* inodes; // location to inodes
 	int num_of_blocks; // number of blocks
-        blocks* blocks; // location to blocks
+        iblock* blocks; // location to blocks
 	int root_inode_idx; //root inode index this is the index of the root directory, rootdir is an inode,
 
 } superblock;
