@@ -2,8 +2,6 @@ hw 12
 
 read/write doesn't work
 
-ssh -i "hw12-yifan.pem" ubuntu@ec2-54-237-221-205.compute-1.amazonaws.com
-
 get adir
 make node
 
