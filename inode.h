@@ -1,15 +1,11 @@
 #include <stdio.h>
 
 typedef struct inode {
-    int refs; // reference count
-    int mode; // permission & type
-    int size; // bytes for file
-    int xtra; // more stuff can go here
+    char mode[3]; // permission & type
+    int user_id; // can be uint16_t, who created this file
+    int size_of; // size of file/dir in bytes
+    int is_file; // flag, if obj is file = 1, dir = 0
 } inode;
-
-void pages_init(const char* path);
-void pages_free();
-void* pages_get_inode(int inum);
-inode* pages_get(int node_id);
-int pages_find_empty();
-void print_inode(inode* node);
+void inode_init(const char *pathname, inode current_inode);
+inode get_inode(const char *pathname, inode inodes[], int index);
+int inode_bitmap_find_next_empty(int inode_bitmap[]);

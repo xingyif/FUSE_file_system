@@ -2,6 +2,6 @@
 
 
 typedef struct directory {
-	char[31] filename;
+	char filename[31];
 	int inode_index;
 } directory;
