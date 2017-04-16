@@ -1,6 +1,6 @@
-// ATTENTION: this is Nat trying to fake the fs so that the tests run
-// you can ignore the file, and instead make the nufs.c main function call your functions
-// however, this file is a good example of what the fs at least should do
+// ATTENTION: this should be where everything {superblock, bitmaps, inodes, iblocks} exist
+// todo, init individual inodes/blocks when creating data, in nufs.c, only call those init functions, write init here
+// this file should be the middleware => operation file
 
 #include <stdio.h>
 #include <string.h>
@@ -13,16 +13,20 @@ typedef struct file_data {
     const char* data;
 } file_data;
 
-static file_data file_table[] = {
-    {"/", 040755, 0},
-    {"/hello.txt", 0100644, "hello\n"},
-    {0, 0, 0},
-};
+// todo when to put metadata to inode & when to put data to iblock???
+//static file_data file_table[] = {
+//    {"/", 040755, 0},
+//    {"/hello.txt", 0100644, "hello\n"},
+//    {0, 0, 0},
+//};
 
 void
 storage_init(const char* path)
 { 
-// superblock_init here
+    // superblock_init here
+    // bitmaps init here
+    // inodes init here
+    // iblocks init here
     printf("TODO: Store file system data in: %s\n", path);
 }
 
@@ -34,6 +38,9 @@ streq(const char* aa, const char* bb)
 
 static file_data*
 get_file_data(const char* path) {
+    // 1. truncate path
+    // 2. get inodes
+    // 3. get iblocks
     for (int ii = 0; 1; ++ii) {
         file_data row = file_table[ii];
 

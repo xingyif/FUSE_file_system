@@ -12,68 +12,65 @@
 #include "inode.h"
 #include "slist.h"
 #include "util.h"
+#include "iblock.h"
 
 // todo rewrite this for init, free, and get(if null, init)
 
 const int NUFS_SIZE  = 1024 * 1024; // 1MB
+const int IBLOCK_SIZE = 1024 * 4; // = 4096 = 4k block
 const int IBLOCK_COUNT = 256;
 
 static int   iblock_fd   = -1;
-static void* iblock_base =  0;
+static void* iblock_ptr =  0;
 
+// initialize a single 4k block
 void
-iblock_init(const char* path)
+iblocks_init(const char* path)
 {
     iblock_fd = open(path, O_CREAT | O_RDWR, 0644);
     assert(iblock_fd != -1);
 
+    // the regular file named by path or referenced by fd to be truncated to a size of precisely length bytes.
     int rv = ftruncate(iblock_fd, NUFS_SIZE);
-    assert(rv == 0);
+    assert(rv == 0); // success
 
-    iblock_base = mmap(0, NUFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, iblock_fd, 0);
-    assert(iblock_base != MAP_FAILED);
+    iblock_ptr = mmap(0, IBLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, iblock_fd, 0);
+    assert(iblock_ptr != MAP_FAILED);
 }
 
 void
 iblock_free()
 {
-    int rv = munmap(iblock_base, NUFS_SIZE);
+    int rv = munmap(iblock_ptr, IBLOCK_SIZE);
     assert(rv == 0);
 }
 
-void*
-iblock_get_inode(int inum)
+iblock
+iblock_get(iblock iblocks[], int iblock_bitmap[])
 {
-    return iblock_base + 4096 * inum;
-}
-
-inode*
-iblock_get(int node_id)
-{
-    inode* idx = (inode*) iblock_get_inode(0);
-    int inum = iblock_find_empty();
-    return &(idx[inum]);
+    int next_aval_index = iblock_bitmap_find_next_empty(iblock_bitmap);
+    return iblocks[next_aval_index];
 }
 
 int
-iblock_find_empty()
+iblock_bitmap_find_next_empty(int iblock_bitmap[])
 {
-    int pnum = -1;
+    int iblock_index = -1;
     for (int ii = 2; ii < IBLOCK_COUNT; ++ii) {
-        if (0) { // if iblock is empty
-            pnum = ii;
+        if (iblock_bitmap[ii] == 0) { // if iblock is empty
+            iblock_index = ii;
             break;
         }
     }
-    return pnum;
+    return iblock_index;
 }
 
 void
 print_node(inode* node)
 {
     if (node) {
-        printf("node{refs: %d, mode: %04o, size: %d, xtra: %d}\n",
-               node->refs, node->mode, node->size, node->xtra);
+        printf("node{user_id: %d, mode: %04o, size: %d, is_file: %d}\n",
+               node->user_id, node->mode, node->size_of, node->is_file);
     }
     else {
         printf("node{null}\n");

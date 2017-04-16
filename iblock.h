@@ -9,7 +9,6 @@ typedef struct iblock {
 // not sure how many we need
 void iblock_init(const char* path);
 void iblock_free();
-void* iblock_get_inode(int inum);
-inode* iblock_get(int node_id);
-int iblock_find_empty();
+iblock iblock_get(iblock iblocks[], int iblock_bitmap[]);
+int iblock_bitmap_find_next_empty(int iblock_bitmap[]);
 void print_inode(inode* node);

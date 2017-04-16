@@ -7,4 +7,5 @@ typedef struct inode {
     int is_file; // flag, if obj is file = 1, dir = 0
 } inode;
 void inode_init(const char *pathname, inode current_inode);
-inode get_inode(const char *pathname, inode inodes[256], int index);
+inode get_inode(const char *pathname, inode inodes[], int index);
+int inode_bitmap_find_next_empty(int inode_bitmap[]);
