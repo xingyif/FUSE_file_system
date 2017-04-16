@@ -175,11 +175,8 @@ int
 main(int argc, char *argv[])
 {
     assert(argc > 2);
-if (superblk == NULL) {
-	superblk = superblock_init();
-}
-//	slist* path = split(argv[--argc]); 
-  // storage_init(argv[--argc]);
+//	slist* path = split(argv[--argc]); - also call util function 
+   storage_init(argv[--argc]);
 //   superblock_add_inode(argv[--argc]);
 	 nufs_init_ops(&nufs_ops);
     return fuse_main(argc, argv, &nufs_ops, NULL);

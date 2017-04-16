@@ -6,6 +6,8 @@
 #include <string.h>
 
 #include "storage.h"
+#include "superblock.h"
+#include "directory.h"
 
 typedef struct file_data {
     const char* path;
@@ -25,6 +27,9 @@ void
 storage_init(const char* path)
 { 
     // superblock_init here
+	superblock* sprblk = superblock_init();
+//directory init here
+	directory* dir = directory_init();
     // bitmaps init here
     // inodes init here
     // iblocks init here

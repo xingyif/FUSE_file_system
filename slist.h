@@ -5,6 +5,7 @@ typedef struct slist {
     char* data;
     int   refs;
     struct slist* next;
+    int index;
 } slist;
 
 slist* s_cons(const char* text, slist* rest);
