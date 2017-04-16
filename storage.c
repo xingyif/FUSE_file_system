@@ -20,6 +20,7 @@ typedef struct file_data {
 //    {0, 0, 0},
 //};
 
+// todo nufs.c should still call storage_init in main
 void
 storage_init(const char* path)
 { 
