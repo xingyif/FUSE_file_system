@@ -29,11 +29,11 @@ clamp(int x, int v0, int v1)
     return max(v0, min(x, v1));
 }
 
-char[]
-slist_close(slist* list) {
+char
+*slist_close(slist* list) {
 int size = list->index;
  char clist[size];
-for(i=0; i < size; i++) {
+for(int i=0; i < size; i++) {
 clist[i] = list->data;
 list = list->next;
 
