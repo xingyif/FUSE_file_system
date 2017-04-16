@@ -178,7 +178,7 @@ main(int argc, char *argv[])
 if (superblk == NULL) {
 	superblk = superblock_init();
 }
-//	slist* path = split(argv[--argc]); 
+//	slist* path = split(argv[--argc]); - also call util function 
   // storage_init(argv[--argc]);
 //   superblock_add_inode(argv[--argc]);
 	 nufs_init_ops(&nufs_ops);
