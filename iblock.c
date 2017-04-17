@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "inode.h"
 #include "slist.h"
@@ -21,28 +22,28 @@ const int IBLOCK_SIZE = 1024 * 4; // = 4096 = 4k block
 const int IBLOCK_COUNT = 256;
 
 static int   iblock_fd   = -1;
-static void* iblock_ptr =  0;
+//static void* iblock_ptr =  0;
 
 // initialize a single 4k block
-void
-iblocks_init(const char* path)
+iblock*
+iblocks_init()
 {
-    iblock_fd = open(path, O_CREAT | O_RDWR, 0644);
-    assert(iblock_fd != -1);
+//    iblock_fd = open(path, O_CREAT | O_RDWR, 0644);
+//    assert(iblock_fd != -1);
 
     // the regular file named by path or referenced by fd to be truncated to a size of precisely length bytes.
-    int rv = ftruncate(iblock_fd, NUFS_SIZE);
-    assert(rv == 0); // success
+//    int rv = ftruncate(iblock_fd, NUFS_SIZE);
+//    assert(rv == 0); // success
 
-    iblock_ptr = mmap(0, IBLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, iblock_fd, 0);
+    iblock* iblock_ptr = malloc(IBLOCK_SIZE); // mmap(0, IBLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, iblock_fd, 0);
     assert(iblock_ptr != MAP_FAILED);
+    return iblock_ptr;
 }
 
 void
-iblock_free()
+iblock_free(iblock* iblock_ptr)
 {
-    int rv = munmap(iblock_ptr, IBLOCK_SIZE);
-    assert(rv == 0);
+    free(iblock_ptr); // munmap(iblock_ptr, IBLOCK_SIZE);
 }
 
 iblock

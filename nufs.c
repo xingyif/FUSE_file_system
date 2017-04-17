@@ -66,6 +66,7 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 int
 nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 {
+    // todo inode_init
     printf("mknod(%s, %04o)\n", path, mode);
     return -1;
 }
@@ -75,6 +76,7 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 int
 nufs_mkdir(const char *path, mode_t mode)
 {
+    //todo inode_init
     printf("mkdir(%s)\n", path);
     return -1;
 }
@@ -146,6 +148,7 @@ nufs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_fi
 int
 nufs_write(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
+    // todo inode_init
     printf("write(%s, %ld bytes, @%ld)\n", path, size, offset);
     return -1;
 }

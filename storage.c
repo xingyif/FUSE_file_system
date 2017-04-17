@@ -8,6 +8,7 @@
 #include "storage.h"
 #include "superblock.h"
 #include "directory.h"
+#include "util.h"
 
 typedef struct file_data {
     const char* path;
@@ -22,74 +23,89 @@ typedef struct file_data {
 //    {0, 0, 0},
 //};
 
+
 // todo nufs.c should still call storage_init in main
 void
-storage_init(const char* path)
+storage_init(char* path)
 { 
-    // superblock_init here
-	superblock* sprblk = superblock_init();
-//directory init here
-	directory* dir = directory_init();
-    // bitmaps init here
-    // inodes init here
-    // iblocks init here
+    // initialize superblock
+	superblock_init();
+    // bitmaps initilized, fixed sized in storage.h
+    // inodes initilized, fixed sized in storage.h
+    // iblocks initilized, fixed sized in storage.h
+    // create the root dir and put it to inodes and iblocks
+    slist* path_list = s_split(path, '/'); // todo get home dir from array
+    char* path_array = slist_close(path_list); //todo use while loop to transverse slist instead of path_array
+    directory* root_dir = directory_init(path_array); // todo make this return the 0 index from the arr
+    inode* root_inode = inode_init();
+    iblock* root_iblock = iblock_init();
+
+    inodes[sprblk->root_inode_idx] = root_inode;
+    iblocks[sprblk->root_inode_idx] = root_iblock;
+
+    // mark the root inode & block to be used
+    inode_bitmap[sprblk->root_inode_idx] = 1;
+    iblock_bitmap[sprblk->root_inode_idx] = 1;
     printf("TODO: Store file system data in: %s\n", path);
 }
 
-static int
-streq(const char* aa, const char* bb)
-{
-    return strcmp(aa, bb) == 0;
-}
-
-static file_data*
-get_file_data(const char* path) {
+static void*
+get_entry_block(char* path) {
     // 1. truncate path
     // 2. get inodes
     // 3. get iblocks
-    for (int ii = 0; 1; ++ii) {
-        file_data row = file_table[ii];
-
-        if (file_table[ii].path == 0) {
-            break;
+    slist* path_list = s_split(path, '/'); // todo get given dir/file from array
+    char* path_array = slist_close(path_list); //todo slist_close returns a pointer to the array
+    //todo check if user path starts at home else look at cur_dir path from home
+    directory* cur_dir = (directory*) iblocks[sprblk->root_inode_idx]; // todo don't know if this works
+    //todo assuming that user is giving path that either starts with home dir or entry in home dir
+    if(streq(path_list->data, cur_dir->dir_name)) { //is the user's path starting from this directory or an entry in it
+        path_list = path_list->next;
+    }
+    else {//todo ask prof tuck if this okie
+        perror("user must give path that starts from home\n");
+    }
+    while(path_list != NULL) {
+        int entry_inode_index = directory_lookup(cur_dir, path_list->data);
+        if (entry_inode_index == -1) {
+            perror("can't find block\n");
         }
-
-        if (streq(path, file_table[ii].path)) {
-            return &(file_table[ii]);
+        else {
+            dir_ent* cur_entry = cur_dir->entries[entry_inode_index];
+            if (streq(cur_entry->filename, path_list->data)){
+                return iblocks[cur_entry->entry_inode_index];
+            }
+            else {
+                cur_dir = (directory*) iblocks[entry_inode_index];
+                path_list = path_list->next;
+            }
         }
     }
 
-    return 0;
+    return NULL;
 }
 
 int
-get_stat(const char* path, struct stat* st)
+get_stat(char* path, struct stat* st)
 {
-    file_data* dat = get_file_data(path);
+    inode* dat = get_entry_block(path);
     if (!dat) {
         return -1;
     }
 
     memset(st, 0, sizeof(struct stat));
-    st->st_uid  = getuid();
+    st->st_uid  = dat->user_id; // getuid();
     st->st_mode = dat->mode;
-    if (dat->data) {
-        st->st_size = strlen(dat->data);
-    }
-    else {
-        st->st_size = 0;
-    }
+
+    st->st_size = dat->size_of;
     return 0;
 }
 
 const char*
-get_data(const char* path)
+get_data(char* path)
 {
-    file_data* dat = get_file_data(path);
-    if (!dat) {
-        return 0;
-    }
-
-    return dat->data;
+    // assuming that the given path is to a file not a directory
+    iblock* dat = get_entry_block(path);
+    return dat->contents;
 }
 
