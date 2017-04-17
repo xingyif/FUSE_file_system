@@ -4,6 +4,7 @@
 #include <sys/mman.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 int ROOT_DIR_IDX = 0;
 
@@ -11,10 +12,11 @@ int ROOT_DIR_IDX = 0;
 //static void* inode_ptr =  0;
 //static int   inode_fd   = -1;
 
-
+inode* inodes[256];
+int inode_bitmap[256];
 
 inode*
-inode_init() {
+inode_init(mode_t mode, int is_file, size_t size) {
 //    inode_fd = open(path, O_CREAT | O_RDWR, 0644);
 //    assert(inode_fd != -1);
 
@@ -23,7 +25,13 @@ inode_init() {
 //    assert(rv == 0); // success
 
     inode* inode_ptr = malloc(sizeof(inode)); // mmap(0, sizeof(inode), PROT_READ | PROT_WRITE, MAP_SHARED, inode_fd, 0);
-    assert(inode_ptr != MAP_FAILED);
+//    assert(inode_ptr != MAP_FAILED);
+
+    inode_ptr->user_id = getuid();
+    inode_ptr->mode = mode;
+    inode_ptr->is_file = is_file;
+    inode_ptr->size_of = size;
+
 
     return inode_ptr;
     // put metadata into inode todo should this happen here

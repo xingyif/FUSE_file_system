@@ -21,8 +21,12 @@ superblock* superblk;
 int
 nufs_access(const char *path, int mask)
 {
-    printf("access(%s, %04o)\n", path, mask);
-    return 0;
+    printf("access(%s, %04o)\n", path, mask); // debugging purpose
+    if (get_entry_block(path) == NULL) {
+        return -ENOENT; // path doesn't exist
+    }
+    // todo check u_id? return -EACCESS if the requested permission isn't available?????
+    return 0; // success
 }
 
 // implementation for: man 2 stat
@@ -30,10 +34,10 @@ nufs_access(const char *path, int mask)
 int
 nufs_getattr(const char *path, struct stat *st)
 {
-    printf("getattr(%s)\n", path);
+    printf("getattr(%s)\n", path); // debugging purpose
     int rv = get_stat(path, st);
     if (rv == -1) {
-        return -ENOENT;
+        return -ENOENT; // path doesn't exist
     }
     else {
         return 0;

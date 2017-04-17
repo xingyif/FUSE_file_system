@@ -1,11 +1,15 @@
 #include <stdio.h>
+#include <ntsid.h>
+#include <stddef.h>
 
 typedef struct inode {
-    char mode[3]; // permission & type
+    mode_t mode; // permission & type
     int user_id; // can be uint16_t, who created this file
-    int size_of; // size of file/dir in bytes
+    size_t size_of; // size of file/dir in bytes
     int is_file; // flag, if obj is file = 1, dir = 0
 } inode;
-inode* inode_init();
+
+extern inode* inodes[256];
+inode* inode_init(mode_t mode, int is_file, size_t size);
 inode get_inode(const char *pathname, inode inodes[], int index);
 int inode_bitmap_find_next_empty(int inode_bitmap[]);
