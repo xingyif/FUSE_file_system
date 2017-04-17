@@ -4,9 +4,11 @@
 
 #include <stdio.h>
 #include <string.h>
+//#include "superblock.h"
+//#include "directory.h"
 
 #include "util.h"
-
+//#include "iblock.h"
 #include "storage.h"
 typedef struct file_data {
     const char* path;
@@ -36,7 +38,7 @@ storage_init(char* path)
 //    char* path_array = slist_close(path_list);
     directory* root_dir = directory_init(path_list->data); // return the 0 index from the arr
     inode* root_inode = inode_init();
-    iblock* root_iblock = iblock_init();
+//    iblock* root_iblock = iblock_init();
 
     inodes[sprblk->root_inode_idx] = root_inode;
     iblocks[sprblk->root_inode_idx] = root_dir;

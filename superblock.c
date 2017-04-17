@@ -19,6 +19,7 @@
 
 const int SUPERBLOCK_SIZE  = 1024 * 1024; // 1MB
 
+superblock* sprblk;
 
 void
 superblock_init()

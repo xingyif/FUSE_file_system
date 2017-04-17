@@ -21,6 +21,9 @@ const int NUFS_SIZE  = 1024 * 1024; // 1MB
 const int IBLOCK_SIZE = 1024 * 4; // = 4096 = 4k block
 const int IBLOCK_COUNT = 256;
 
+int iblock_bitmap[256];
+void* iblocks[256]; 
+
 static int   iblock_fd   = -1;
 //static void* iblock_ptr =  0;
 
@@ -65,7 +68,7 @@ iblock_bitmap_find_next_empty(int iblock_bitmap[])
     }
     return iblock_index;
 }
-
+/*
 void
 print_node(inode* node)
 {
@@ -78,6 +81,6 @@ print_node(inode* node)
     }
 }
 
-
+*/
 
 
