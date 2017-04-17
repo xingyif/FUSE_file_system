@@ -25,7 +25,7 @@ clamp(int x, int v0, int v1) {
     return max(v0, min(x, v1));
 }
 
-//this functionality makes no sense just look through slist not through array
+/*this functionality makes no sense just look through slist not through array
 char*
 slist_close(slist *list) {
     int size = list->index;
@@ -36,6 +36,6 @@ slist_close(slist *list) {
 
     }
     return clist;
-}
+}*/
 
 #endif

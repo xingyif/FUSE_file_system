@@ -27,8 +27,8 @@ superblock_init()
     assert(sprblk != 0);
 	sprblk->ibitmap_location = &inode_bitmap;
 	sprblk->bbitmap_location = &iblock_bitmap;
-	sprblk->num_of_inodes = INODE_COUNT;
-    sprblk->num_of_blocks = INODE_COUNT;
+	sprblk->num_of_inodes = 256;
+    sprblk->num_of_blocks = 256;
     sprblk->inodes = &inodes;
     sprblk->blocks = &iblocks;
 	sprblk->root_inode_idx = 0;

@@ -47,7 +47,7 @@ storage_init(char* path)
     printf("TODO: Store file system data in: %s\n", path);
 }
 
-static void*
+void*
 get_entry_block(char* path) {
     // 1. truncate path
     // 2. get inodes
@@ -66,7 +66,8 @@ get_entry_block(char* path) {
     while(path_list != NULL) {
         int entry_inode_index = directory_lookup(cur_dir, path_list->data);
         if (entry_inode_index == -1) {
-            perror("can't find block\n");
+//            perror("can't find block\n");
+  		return NULL;
         }
         else {
             dir_ent* cur_entry = cur_dir->entries[entry_inode_index];

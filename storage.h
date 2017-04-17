@@ -12,9 +12,10 @@ extern int inode_bitmap[256];
 extern int iblock_bitmap[256];
 extern inode* inodes[256];
 extern void* iblocks[256]; // void* because it can be an iblock/directory
-extern int INODE_COUNT = 256; // extern variable can't have an initializer
+//extern int INODE_COUNT = 256; // extern variable can't have an initializer
 
 void storage_init(char* path);
+void* get_entry_block(char* path);
 int         get_stat(char* path, struct stat* st);
 const char* get_data(char* path);
 
