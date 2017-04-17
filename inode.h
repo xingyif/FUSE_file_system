@@ -1,7 +1,8 @@
 #include <stdio.h>
-#include <ntsid.h>
+//#include <ntsid.h>
 #include <stddef.h>
-
+#include <sys/stat.h> //need for mode_t to work on linux
+#include<sys/types.h> //need for mode_t to work on linux
 typedef struct inode {
     mode_t mode; // permission & type
     int user_id; // can be uint16_t, who created this file

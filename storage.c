@@ -37,7 +37,8 @@ storage_init(char* path)
     slist* path_list = s_split(path, '/'); // todo get home dir from array
 //    char* path_array = slist_close(path_list);
     directory* root_dir = directory_init(path_list->data); // return the 0 index from the arr
-    inode* root_inode = inode_init();
+	//todo check the size to put in here
+    inode* root_inode = inode_init(S_IRUSR | S_IWUSR | S_IXUSR, 0, 128);
 //    iblock* root_iblock = iblock_init();
 
     inodes[sprblk->root_inode_idx] = root_inode;
