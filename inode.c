@@ -1,5 +1,5 @@
 #include "inode.h"
-#include "storage.h"
+//#include "storage.h"
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <assert.h>
@@ -51,7 +51,7 @@ int
 inode_bitmap_find_next_empty(int inode_bitmap[])
 {
     int inode_index = -1;
-    for (int ii = 2; ii < INODE_COUNT; ++ii) {
+    for (int ii = 2; ii < 256; ++ii) {
         if (inode_bitmap[ii] == 0) { // if iblock is empty
             inode_index = ii;
             break;

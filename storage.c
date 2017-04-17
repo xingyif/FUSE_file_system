@@ -5,11 +5,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "storage.h"
-#include "superblock.h"
-#include "directory.h"
 #include "util.h"
 
+#include "storage.h"
 typedef struct file_data {
     const char* path;
     int         mode;
@@ -35,13 +33,13 @@ storage_init(char* path)
     // iblocks initilized, fixed sized in storage.h
     // create the root dir and put it to inodes and iblocks
     slist* path_list = s_split(path, '/'); // todo get home dir from array
-    char* path_array = slist_close(path_list); //todo use while loop to transverse slist instead of path_array
-    directory* root_dir = directory_init(path_array); // todo make this return the 0 index from the arr
+//    char* path_array = slist_close(path_list);
+    directory* root_dir = directory_init(path_list->data); // return the 0 index from the arr
     inode* root_inode = inode_init();
     iblock* root_iblock = iblock_init();
 
     inodes[sprblk->root_inode_idx] = root_inode;
-    iblocks[sprblk->root_inode_idx] = root_iblock;
+    iblocks[sprblk->root_inode_idx] = root_dir;
 
     // mark the root inode & block to be used
     inode_bitmap[sprblk->root_inode_idx] = 1;
@@ -54,8 +52,8 @@ get_entry_block(char* path) {
     // 1. truncate path
     // 2. get inodes
     // 3. get iblocks
-    slist* path_list = s_split(path, '/'); // todo get given dir/file from array
-    char* path_array = slist_close(path_list); //todo slist_close returns a pointer to the array
+    slist* path_list = s_split(path, '/');//  get given dir/file from array
+//    char* path_array = slist_close(path_list); don't need to use  slist_close returns a pointer to the array
     //todo check if user path starts at home else look at cur_dir path from home
     directory* cur_dir = (directory*) iblocks[sprblk->root_inode_idx]; // todo don't know if this works
     //todo assuming that user is giving path that either starts with home dir or entry in home dir

@@ -1,4 +1,4 @@
-#ifndef DIRECTORY_H
+/*#ifndef DIRECTORY_H
 #define DIRECTORY_H
 
 #define DIR_SIZE 64
@@ -30,4 +30,4 @@ slist* directory_list(const char* path);
 void print_directory(directory dd);
 
 #endif
-
+*/

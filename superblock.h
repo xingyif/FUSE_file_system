@@ -8,6 +8,7 @@
 
 #include "inode.h"
 #include "iblock.h"
+//#include "storage.h"
 
 typedef struct superblock {
 	int (*ibitmap_location)[256]; // location of inode bitmap
