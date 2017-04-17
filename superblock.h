@@ -6,9 +6,9 @@
 // import block.h inode.h pages.h
 #include <stdio.h>
 
-#include "inode.h"
-#include "iblock.h"
-//#include "storage.h"
+//#include "inode.h"
+//#include "iblock.h"
+#include "storage.h"
 
 typedef struct superblock {
 	int (*ibitmap_location)[256]; // location of inode bitmap
@@ -20,6 +20,9 @@ typedef struct superblock {
 	int root_inode_idx; //root inode index this is the index of the root directory, rootdir is an inode,
 
 } superblock;
+
+extern superblock* sprblk;
+
 void   superblock_init();
 void   superblock_free();
 void   print_superblock(superblock* superblock);
