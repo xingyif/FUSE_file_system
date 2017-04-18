@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
 
 int ROOT_DIR_IDX = 0;
 
@@ -31,39 +32,38 @@ inode_init(mode_t mode, int is_file, size_t size) {
     inode_ptr->mode = mode;
     inode_ptr->is_file = is_file;
     inode_ptr->size_of = size;
-
-
     return inode_ptr;
-    // put metadata into inode todo should this happen here
-//    struct stat *buf;
-//    stat(pathname, buf);
-//    current_inode.mode = buf->st_mode;
-//    current_inode.user_id = buf->st_uid;
-//    current_inode.size_of = buf->st_size;
-//    current_inode.size_of = is_file(pathname); // todo write a function in util to read last 3 char in given path, return 1 for file, 0 for dir
+}
+void
+inode_free(inode* inode_ptr) {
+   free(inode_ptr);
+}
+// find an empty spot in inodes, insert the given inode, return the index of where the inode is stored or failure
+int
+inode_insert(inode* cur_inode, inode* inodes[], int inode_bitmap[]) {
+    int next_aval_index = inode_bitmap_find_next_empty(inode_bitmap);
+    if (next_aval_index < 0) {
+        // operation failed due to lack of memory or disk space
+        return next_aval_index;
+    }
+    inodes[next_aval_index] = cur_inode;
+    // update bitmap
+    inode_bitmap[next_aval_index] = 1;
+    // success should return an int >= 0
+    return next_aval_index;
 }
 
-inode
-inode_get(const char *pathname, inode inodes[]) {
-//    inode current_inode = inodes[index];
-    // if this is the first time
-//    if (current_inode == NULL) { // todo should i use array of ptrs for inodes?
-        // initialize inode
-//        inode_init(pathname, current_inode);
-//    }
-    int next_aval_index = inode_bitmap_find_next_empty(inodes);
-    return inodes[next_aval_index];
-}
 
 int
 inode_bitmap_find_next_empty(int inode_bitmap[])
 {
-    int inode_index = -1;
+    int inode_index = -ENOMEM; // operation failed due to lack of memory or disk space
     for (int ii = 2; ii < 256; ++ii) {
         if (inode_bitmap[ii] == 0) { // if iblock is empty
             inode_index = ii;
             break;
         }
     }
+    // return a value >= 0 if success, else return -ENOMEM for failure
     return inode_index;
 }

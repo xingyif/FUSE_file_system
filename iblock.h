@@ -11,7 +11,7 @@ typedef struct iblock {
 // not sure how many we need
 iblock* iblock_init();
 void iblock_free(iblock* iblock_ptr);
-iblock iblock_get(iblock iblocks[], int iblock_bitmap[]);
+int iblock_insert(void* cur_iblock, void* iblocks[], int iblock_bitmap[]);
 int iblock_bitmap_find_next_empty(int iblock_bitmap[]);
 //void print_inode(inode* node);
 

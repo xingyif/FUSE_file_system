@@ -39,7 +39,7 @@ iblocks_init()
 //    assert(rv == 0); // success
 
     iblock* iblock_ptr = malloc(IBLOCK_SIZE); // mmap(0, IBLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, iblock_fd, 0);
-    assert(iblock_ptr != MAP_FAILED);
+//    assert(iblock_ptr != MAP_FAILED);
     return iblock_ptr;
 }
 
@@ -49,17 +49,25 @@ iblock_free(iblock* iblock_ptr)
     free(iblock_ptr); // munmap(iblock_ptr, IBLOCK_SIZE);
 }
 
-iblock
-iblock_get(iblock iblocks[], int iblock_bitmap[])
+// find an empty spot in iblocks, insert the given iblock, return the index of where the iblock is stored or failure
+int
+iblock_insert(void* cur_iblock, void* iblocks[], int iblock_bitmap[])
 {
     int next_aval_index = iblock_bitmap_find_next_empty(iblock_bitmap);
-    return iblocks[next_aval_index];
+    if (next_aval_index < 0) {
+        // operation failed due to lack of memory or disk space
+        return next_aval_index;
+    }
+    iblocks[next_aval_index] = cur_iblock;
+    // update bitmap
+    iblock_bitmap[next_aval_index] = 1;
+    return next_aval_index;
 }
 
 int
 iblock_bitmap_find_next_empty(int iblock_bitmap[])
 {
-    int iblock_index = -1;
+    int iblock_index = -ENOMEM; // opration failed due to lack of memory/disk space
     for (int ii = 2; ii < IBLOCK_COUNT; ++ii) {
         if (iblock_bitmap[ii] == 0) { // if iblock is empty
             iblock_index = ii;

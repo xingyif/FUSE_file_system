@@ -46,6 +46,7 @@ nufs_getattr(const char *path, struct stat *st)
 
 // implementation for: man 2 readdir
 // lists the contents of a directory
+// todo
 int
 nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
              off_t offset, struct fuse_file_info *fi)
@@ -70,8 +71,16 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 int
 nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 {
-    // todo inode_init
-    printf("mknod(%s, %04o)\n", path, mode);
+    // todo check if file already exist, if yes, return error
+    inode* cur_inode = inode_init(mode, 1, 0);
+    int rv_inode = inode_insert(cur_inode, inodes, inode_bitmap);
+    assert(rv_inode >= 0);
+
+    directory* cur_dir = directory_init(slist_last(path));
+    int rv_iblock = iblock_insert(cur_dir, iblocks, iblock_bitmap);
+    assert(rv_iblock >= 0);
+
+    printf("after mknod(%s, %04o)\n", path, mode);
     return -1;
 }
 
@@ -80,8 +89,19 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 int
 nufs_mkdir(const char *path, mode_t mode)
 {
-    //todo inode_init
-    printf("mkdir(%s)\n", path);
+    // todo check if dir already exist, if yes, return error
+    // inode_init
+    inode* cur_inode = inode_init(mode, 0, 0); // not file, size = 0
+    // inode insert
+    int rv_inode = inode_insert(cur_inode, inodes, inode_bitmap);
+    assert(rv_inode >= 0);
+    // iblock init
+    directory* cur_dir = directory_init(slist_last(path));
+    // iblock insert
+    int rv_iblock = iblock_insert(cur_dir, iblocks, inode_bitmap);
+    assert(rv_iblock >= 0);
+
+    printf("after mkdir(%s)\n", path);
     return -1;
 }
 
