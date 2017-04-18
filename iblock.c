@@ -1,18 +1,6 @@
 #include <string.h>
-
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <assert.h>
-#include <fcntl.h>
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
-
-#include "inode.h"
-#include "slist.h"
-#include "util.h"
 #include "iblock.h"
 
 // todo rewrite this for init, free, and get(if null, init)
