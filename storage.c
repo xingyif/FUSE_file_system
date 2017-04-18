@@ -1,9 +1,11 @@
 // ATTENTION: this should be where everything {superblock, bitmaps, inodes, iblocks} exist
 // todo, init individual inodes/blocks when creating data, in nufs.c, only call those init functions, write init here
 // this file should be the middleware => operation file
-
+// created by Nat Tuck
+// mofied by Yifan & Brett
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 //#include "superblock.h"
 //#include "directory.h"
 
@@ -35,15 +37,21 @@ storage_init(char* path)
     // iblocks initilized, fixed sized in storage.h
     // create the root dir and put it to inodes and iblocks
     slist* path_list = s_split(path, '/'); // todo get home dir from array
-//    char* path_array = slist_close(path_list);
+    //  char* path_array = slist_close(path_list);
     directory* root_dir = directory_init(path_list->data); // return the 0 index from the arr
 	//todo check the size to put in here
     inode* root_inode = inode_init(S_IRWXU | S_IRWXG | S_IRWXO, 0, 128);
-//    iblock* root_iblock = iblock_init();
+    // iblock* root_iblock = iblock_init();
 
-    // todo call inode/iblock insert here instead
-    inodes[sprblk->root_inode_idx] = root_inode;
-    iblocks[sprblk->root_inode_idx] = root_dir;
+    int rv_inode = inode_insert(root_inode, inodes, inode_bitmap);
+    // inodes[sprblk->root_inode_idx] = root_inode;
+    // make sure the inode is inserted into index 0 in inodes
+    assert(rv_inode == 0);
+
+    int rv_iblock = iblock_insert(root_dir, iblocks, iblock_bitmap);
+    //  iblocks[sprblk->root_inode_idx] = root_dir;
+    // assure that root_dir is inserted at index 0 in iblocks
+    assert(rv_iblock == 0);
 
     // mark the root inode & block to be used
     inode_bitmap[sprblk->root_inode_idx] = 1;
@@ -57,7 +65,7 @@ get_entry_block(char* path) {
     // 2. get inodes
     // 3. get iblocks
     slist* path_list = s_split(path, '/');//  get given dir/file from array
-//    char* path_array = slist_close(path_list); don't need to use  slist_close returns a pointer to the array
+    //  char* path_array = slist_close(path_list); don't need to use  slist_close returns a pointer to the array
     //todo check if user path starts at home else look at cur_dir path from home
     directory* cur_dir = (directory*) iblocks[sprblk->root_inode_idx]; // todo don't know if this works
     //todo assuming that user is giving path that either starts with home dir or entry in home dir
@@ -72,7 +80,7 @@ get_entry_block(char* path) {
     while(path_list != NULL) {
         int entry_inode_index = directory_lookup(cur_dir, path_list->data);
         if (entry_inode_index == -1) {
-//            perror("can't find block\n");
+        // perror("can't find block\n");
   		return NULL;
         }
         else {
