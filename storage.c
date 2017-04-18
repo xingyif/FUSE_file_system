@@ -39,10 +39,10 @@ storage_init(char* path)
 printf("given path: %s\n", path);   
  slist* path_list = s_split(path, '/'); // todo get home dir from array
     //  char* path_array = slist_close(path_list);
-	while(path_list != NULL) {
+/*	while(path_list != NULL) {
 	printf("home path: %s\n", path_list->data);   
-	path_list = path_list->next;
-}
+	path_list = path_list->next; //TODO gives weird segault error
+}*/ 
  directory* root_dir = directory_init(path_list->data); // return the 0 index from the arr
 	//todo check the size to put in here
     inode* root_inode = inode_init(S_IRWXU | S_IRWXG | S_IRWXO, 0, 128);

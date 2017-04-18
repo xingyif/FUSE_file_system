@@ -7,7 +7,7 @@
 #include <dirent.h>
 #include <bsd/string.h>
 #include <assert.h>
-
+#include <sys/mount.h>
 #define FUSE_USE_VERSION 26
 #include <fuse.h>
 
@@ -203,8 +203,9 @@ main(int argc, char *argv[])
 {
     assert(argc > 2);
 //	slist* path = split(argv[--argc]); - also call util function 
-   storage_init(argv[--argc]);
+   storage_init(argv[3]);
 //   superblock_add_inode(argv[--argc]);
+mount(argv[--argc], argv[3], "sysfs", 0, "");
 	 nufs_init_ops(&nufs_ops);
     return fuse_main(argc, argv, &nufs_ops, NULL);
 }
