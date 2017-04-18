@@ -36,22 +36,27 @@ storage_init(char* path)
     // inodes initilized, fixed sized in storage.h
     // iblocks initilized, fixed sized in storage.h
     // create the root dir and put it to inodes and iblocks
-    slist* path_list = s_split(path, '/'); // todo get home dir from array
+printf("given path: %s\n", path);   
+ slist* path_list = s_split(path, '/'); // todo get home dir from array
     //  char* path_array = slist_close(path_list);
-    directory* root_dir = directory_init(path_list->data); // return the 0 index from the arr
+	while(path_list != NULL) {
+	printf("home path: %s\n", path_list->data);   
+	path_list = path_list->next;
+}
+ directory* root_dir = directory_init(path_list->data); // return the 0 index from the arr
 	//todo check the size to put in here
     inode* root_inode = inode_init(S_IRWXU | S_IRWXG | S_IRWXO, 0, 128);
     // iblock* root_iblock = iblock_init();
 
-    int rv_inode = inode_insert(root_inode, inodes, inode_bitmap);
-    // inodes[sprblk->root_inode_idx] = root_inode;
+    // int rv_inode = inode_insert(root_inode, inodes, inode_bitmap);
+    inodes[sprblk->root_inode_idx] = root_inode;
     // make sure the inode is inserted into index 0 in inodes
-    assert(rv_inode == 0);
+    // assert(rv_inode == 0);
 
-    int rv_iblock = iblock_insert(root_dir, iblocks, iblock_bitmap);
-    //  iblocks[sprblk->root_inode_idx] = root_dir;
+    // int rv_iblock = iblock_insert(root_dir, iblocks, iblock_bitmap);
+    iblocks[sprblk->root_inode_idx] = root_dir;
     // assure that root_dir is inserted at index 0 in iblocks
-    assert(rv_iblock == 0);
+    // assert(rv_iblock == 0);
 
     // mark the root inode & block to be used
     inode_bitmap[sprblk->root_inode_idx] = 1;
