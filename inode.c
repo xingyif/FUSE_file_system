@@ -42,6 +42,7 @@ inode_free(inode* inode_ptr) {
 int
 inode_insert(inode* cur_inode, inode* inodes[], int inode_bitmap[]) {
     int next_aval_index = inode_bitmap_find_next_empty(inode_bitmap);
+    printf("next index %d\n", next_aval_index);
     if (next_aval_index < 0) {
         // operation failed due to lack of memory or disk space
         return next_aval_index;
@@ -58,7 +59,7 @@ int
 inode_bitmap_find_next_empty(int inode_bitmap[])
 {
     int inode_index = -ENOMEM; // operation failed due to lack of memory or disk space
-    for (int ii = 2; ii < 256; ++ii) {
+    for (int ii = 0; ii < 256; ++ii) {
         if (inode_bitmap[ii] == 0) { // if iblock is empty
             inode_index = ii;
             break;

@@ -56,7 +56,7 @@ int
 iblock_bitmap_find_next_empty(int iblock_bitmap[])
 {
     int iblock_index = -ENOMEM; // opration failed due to lack of memory/disk space
-    for (int ii = 2; ii < IBLOCK_COUNT; ++ii) {
+    for (int ii = 0; ii < IBLOCK_COUNT; ++ii) {
         if (iblock_bitmap[ii] == 0) { // if iblock is empty
             iblock_index = ii;
             break;
