@@ -38,9 +38,10 @@ storage_init(char* path)
 //    char* path_array = slist_close(path_list);
     directory* root_dir = directory_init(path_list->data); // return the 0 index from the arr
 	//todo check the size to put in here
-    inode* root_inode = inode_init(S_IRUSR | S_IWUSR | S_IXUSR, 0, 128);
+    inode* root_inode = inode_init(S_IRWXU | S_IRWXG | S_IRWXO, 0, 128);
 //    iblock* root_iblock = iblock_init();
 
+    // todo call inode/iblock insert here instead
     inodes[sprblk->root_inode_idx] = root_inode;
     iblocks[sprblk->root_inode_idx] = root_dir;
 
@@ -62,10 +63,12 @@ get_entry_block(char* path) {
     //todo assuming that user is giving path that either starts with home dir or entry in home dir
     if(streq(path_list->data, cur_dir->dir_name)) { //is the user's path starting from this directory or an entry in it
         path_list = path_list->next;
-    }
-    else {//todo ask prof tuck if this okie
+    }/*
+    else {//todo ask prof tuck if this oki
+	printf("current directory: %s\n", cur_dir->dir_name);
+	printf("path list: %s\n", path_list->data);
         perror("user must give path that starts from home\n");
-    }
+    }*/
     while(path_list != NULL) {
         int entry_inode_index = directory_lookup(cur_dir, path_list->data);
         if (entry_inode_index == -1) {
