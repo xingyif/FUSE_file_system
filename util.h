@@ -25,17 +25,13 @@ clamp(int x, int v0, int v1) {
     return max(v0, min(x, v1));
 }
 
-/*this functionality makes no sense just look through slist not through array
-char*
-slist_close(slist *list) {
-    int size = list->index;
-    char clist[size];
-    for (int i = 0; i < size; i++) {
-        clist[i] = list->data;
-        list = list->next;
-
-    }
-    return clist;
-}*/
+//this functionality makes no sense just look through slist not through array
+slist*
+slist_last(slist *list) {
+    while(list->next != NULL) {
+	list = list->next;
+}
+    return list;
+}
 
 #endif
