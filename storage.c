@@ -38,7 +38,7 @@ storage_init(char* disk_image)
 {
 	printf("home path: %s\n", disk_image);
     int fd;
-    if ((fd = open(disk_image,O_CREAT | O_RDWR)) == -1) {
+    if ((fd = open(disk_image, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR)) == -1) {
         perror("Opening disk image failed!");
         exit(1);
     }
@@ -46,6 +46,10 @@ storage_init(char* disk_image)
     // errno to indicate the error return - value if failed
     disk = mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     // initialize superblock if it has never been initialized before
+
+
+// Had to comment out to try and avoid this error
+
     if (superblock_addr()->ibitmap_location == NULL) { // todo ? check a field, because sprblk_addr = disk
 	    superblock_init();
     }
