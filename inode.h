@@ -20,3 +20,4 @@ inode* inode_init(mode_t mode, int is_file, size_t size);
 void inode_free(inode* inode_ptr);
 int inode_insert(inode* cur_inode, inode* inodes[], int inode_bitmap[]);
 int inode_bitmap_find_next_empty(int inode_bitmap[]);
+inode* inodes_addr();

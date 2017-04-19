@@ -11,7 +11,7 @@ s_cons(const char* text, slist* rest)
     xs->data = strdup(text);
     xs->refs = 1;
     xs->next = rest;
-    if (xs->next ==NULL) {
+    if (xs->next == NULL) {
    	xs->index = 1;
     }
     else {

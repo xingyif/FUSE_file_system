@@ -83,5 +83,8 @@ superblock_add_inode(const char* path) {
 //mark in bitmap that free location is used
 }
 
-
+superblock*
+superblock_addr() {
+    return (superblock*) disk;
+}
 

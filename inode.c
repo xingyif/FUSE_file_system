@@ -38,6 +38,7 @@ void
 inode_free(inode* inode_ptr) {
    free(inode_ptr);
 }
+
 // find an empty spot in inodes, insert the given inode, return the index of where the inode is stored or failure
 int
 inode_insert(inode* cur_inode, inode* inodes[], int inode_bitmap[]) {
@@ -67,4 +68,8 @@ inode_bitmap_find_next_empty(int inode_bitmap[])
     }
     // return a value >= 0 if success, else return -ENOMEM for failure
     return inode_index;
+}
+
+inode* inodes_addr() {
+    return (inode*) (disk + sprblk->inodes);
 }

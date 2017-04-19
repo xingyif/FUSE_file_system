@@ -204,7 +204,7 @@ main(int argc, char *argv[])
 {
     assert(argc > 2);
 //	slist* path = split(argv[--argc]); - also call util function 
-   storage_init(argv[--argc]);
+   storage_init(argv[--argc]); // disk_image
 //   superblock_add_inode(argv[--argc]);
 	 nufs_init_ops(&nufs_ops);
     // mount happened magically in fuse_main
