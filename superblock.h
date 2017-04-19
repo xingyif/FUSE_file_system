@@ -18,7 +18,7 @@ typedef struct superblock {
 	int root_inode_idx; //root inode index this is the index of the root directory
 } superblock;
 
-extern superblock* sprblk;
+//extern superblock* sprblk; todo we can use superblock_addr
 
 void   superblock_init();
 void   superblock_free();

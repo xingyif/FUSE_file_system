@@ -78,8 +78,8 @@ print_node(inode* node)
 }
 
 */
-iblock*
+void**
 iblocks_addr() {
-    return (iblock*) disk + sprblk->iblocks;
+    return (void**) disk + sprblk->iblocks;
 }
 

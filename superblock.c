@@ -6,13 +6,16 @@
 //import pages
 //import inode
 
-superblock* sprblk;
+//superblock* sprblk;
 
 void
 superblock_init()
 {
     // offset for the superblock
     size_t offset = 0;
+
+    // todo not sure if i need this
+    superblock* sprblk = disk;
 
     // offset for inode_bitmap
     offset += sizeof(superblock);

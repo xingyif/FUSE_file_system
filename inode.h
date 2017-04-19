@@ -5,7 +5,7 @@
 #include<sys/types.h> //need for mode_t to work on linux
 typedef struct inode {
     mode_t mode; // permission & type
-    int user_id; // can be uint16_t, who created this file
+    uid_t user_id; // can be uint16_t, who created this file
     size_t size_of; // size of file/dir in bytes
     int is_file; // flag, if obj is file = 1, dir = 0
     // need for part2

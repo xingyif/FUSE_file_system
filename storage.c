@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <errno.h>
 //#include "superblock.h"
 //#include "directory.h"
 
@@ -43,7 +44,7 @@ storage_init(char* disk_image)
     // errno to indicate the error return - value if failed
     disk = mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     // initialize superblock if it has never been initialized before
-    if (sprblk->ibitmap_location == NULL) {
+    if (superblock_addr()->ibitmap_location == NULL) { // todo ? check a field, because sprblk_addr = disk
 	    superblock_init();
     }
 
@@ -88,15 +89,16 @@ storage_init(char* disk_image)
 //    iblock_bitmap[sprblk->root_inode_idx] = 1;
 }
 
-void*
-get_entry_block(char* path) {
+int
+get_entry_index(char *path) {
     // 1. truncate path
     // 2. get inodes
     // 3. get iblocks
     slist* path_list = s_split(path, '/');//  get given dir/file from array
     //  char* path_array = slist_close(path_list); don't need to use  slist_close returns a pointer to the array
     //todo check if user path starts at home else look at cur_dir path from home
-    directory* cur_dir = (directory*) iblocks[sprblk->root_inode_idx]; // todo don't know if this works
+    // fixme addr() returns ** because can't case void to directory
+    directory* cur_dir = (directory*) (iblocks_addr()[superblock_addr()->root_inode_idx]); // todo don't know if this works
     //todo assuming that user is giving path that either starts with home dir or entry in home dir
     if(streq(path_list->data, cur_dir->dir_name)) { //is the user's path starting from this directory or an entry in it
         path_list = path_list->next;
@@ -111,44 +113,71 @@ get_entry_block(char* path) {
         int entry_inode_index = directory_lookup(cur_dir, path_list->data);
         if (entry_inode_index == -1) {
         // perror("can't find block\n");
-  		return NULL;
+  		return -ENOENT;
         }
         else {
             dir_ent* cur_entry = cur_dir->entries[entry_inode_index];
             if (streq(cur_entry->filename, path_list->data)){
-                return iblocks[cur_entry->entry_inode_index];
+                return cur_entry->entry_inode_index;
             }
             else {
-                cur_dir = (directory*) iblocks[entry_inode_index];
+                cur_dir = (directory*) iblocks_addr()[entry_inode_index];
                 path_list = path_list->next;
             }
         }
     }
 
-    return NULL;
+    return -ENOENT;
 }
 
 int
 get_stat(char* path, struct stat* st)
 {
-    inode* dat = get_entry_block(path);
-    if (!dat) {
-        return -1;
+
+    int index = get_entry_index(path);
+    if (index < 0) {
+        // didn't find the given path
+        //todo perror&exit or return errorCode????????????????
+        return -ENOENT; // TODO included <errno.h>
     }
-
+    // write sizeof(stat) bytes of 0 to st
     memset(st, 0, sizeof(struct stat));
-    st->st_uid  = dat->user_id; // getuid();
-    st->st_mode = dat->mode;
 
-    st->st_size = dat->size_of;
+    inode cur_inode = inodes_addr()[index];
+    st->st_uid  = cur_inode.user_id;
+    st->st_mode = cur_inode.mode;
+
+    st->st_size = cur_inode.size_of;
     return 0;
 }
 
 const char*
-get_data(char* path)
+get_data(char* path) // todo do we always assume the path is a file????????????
 {
     // assuming that the given path is to a file not a directory
-    iblock* dat = get_entry_block(path);
-    return dat->contents;
+    int index = get_entry_index(path);
+    if (index < 0) {
+        return -ENOENT;
+    }
+    iblock* cur_iblock = iblocks_addr()[index];
+    return cur_iblock->contents;
 }
 
+//const char*
+//get_data(char* path, int is_file)
+//{
+//    // assuming that the given path is to a file not a directory
+//    int index = get_entry_index(path);
+//    if (index < 0) {
+//        return -ENOENT;
+//    }
+//    iblock* cur_iblock = iblocks_addr()[index];
+//    directory* cur_dir = iblocks_addr()[index];
+//
+//    // if path = file
+//    if (is_file == 1) {
+//          return cur_iblock->contents;
+//    } else {
+//          return cur_dir->entries;
+//    }
+//}
