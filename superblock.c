@@ -17,6 +17,7 @@
 //import pages
 //import inode
 
+superblock* sprblk;
 
 void
 superblock_init()
