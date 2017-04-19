@@ -28,11 +28,12 @@ nufs_access(const char *path, int mask)
         return -ENOENT; // path doesn't exist
     }
     mode_t mode = inodes_addr()[index].mode;
-    // fixme not sure
-    // todo check u_id? return -EACCESS if the requested permission isn't available?????
+    // check u_id? return -EACCESS if the requested permission isn't available
     struct stat* st;
     int rv = nufs_getattr(path, st);
     assert(rv == 0);
+
+
 
     uid_t cur_uid = st->st_uid;
     // Read, write, execute/search by owner
