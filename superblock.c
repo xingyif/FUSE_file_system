@@ -6,8 +6,8 @@
 //import pages
 //import inode
 
-//superblock* sprblk;
-
+superblock* sprblk;
+void* disk;
 void
 superblock_init()
 {
@@ -81,3 +81,11 @@ superblock_addr() {
     return (superblock*) disk;
 }
 
+inode* inodes_addr() {
+    return (inode*) (disk + sprblk->inodes);
+}
+
+int*
+inode_bitmap_addr() {
+    return (int*) (disk + sprblk->ibitmap_location);
+}

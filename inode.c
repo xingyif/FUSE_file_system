@@ -6,8 +6,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
-
+//#include "superblock.h"
 int ROOT_DIR_IDX = 0;
+
+//sprblk = superblock_addr();
 
 //const int INODE_COUNT = 256;
 //static void* inode_ptr =  0;
@@ -69,7 +71,7 @@ inode_bitmap_find_next_empty(int inode_bitmap[])
     // return a value >= 0 if success, else return -ENOMEM for failure
     return inode_index;
 }
-
+/*
 inode* inodes_addr() {
     return (inode*) (disk + sprblk->inodes);
 }
@@ -77,4 +79,4 @@ inode* inodes_addr() {
 int*
 inode_bitmap_addr() {
     return (int*) (disk + sprblk->ibitmap_location);
-}
+}*/

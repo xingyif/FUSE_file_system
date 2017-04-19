@@ -2,7 +2,8 @@
 #include <errno.h>
 #include <stdlib.h>
 #include "iblock.h"
-
+#include "superblock.h"
+#include "storage.h"
 // todo rewrite this for init, free, and get(if null, init)
 
 const int NUFS_SIZE  = 1024 * 1024; // 1MB
@@ -14,7 +15,7 @@ void* iblocks[256];
 
 static int   iblock_fd   = -1;
 //static void* iblock_ptr =  0;
-
+//superblock sprblk = *superblock_addr(); 
 // initialize a single 4k block
 iblock*
 iblocks_init()

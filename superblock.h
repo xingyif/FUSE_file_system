@@ -18,12 +18,15 @@ typedef struct superblock {
 	int root_inode_idx; //root inode index this is the index of the root directory
 } superblock;
 
-//extern superblock* sprblk; todo we can use superblock_addr
+extern superblock* sprblk;// todo we can use superblock_addr
 
 void   superblock_init();
 void   superblock_free();
 void   print_superblock(superblock* superblock);
 void superblock_add_inode(const char* path);
 superblock* superblock_addr();
+inode* inodes_addr();
+int* inode_bitmap_addr();
+                           
 #endif
 
