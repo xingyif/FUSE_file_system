@@ -13,6 +13,7 @@
 
 #include "storage.h"
 #include "superblock.h"
+#include "util.h"
 
 superblock* superblk;
 
@@ -206,6 +207,7 @@ main(int argc, char *argv[])
    storage_init(argv[--argc]);
 //   superblock_add_inode(argv[--argc]);
 	 nufs_init_ops(&nufs_ops);
+    // mount happened magically in fuse_main
     return fuse_main(argc, argv, &nufs_ops, NULL);
 }
 

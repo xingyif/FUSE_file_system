@@ -11,14 +11,11 @@
 #include "storage.h"
 
 typedef struct superblock {
-	int (*ibitmap_location)[256]; // location of inode bitmap
-	int (*bbitmap_location)[256]; // location of block bitmap
-	int num_of_inodes; // number of inodes
-	inode (*inodes)[256]; // location to inodes
-	int num_of_blocks; // number of blocks
-    iblock (*blocks)[256]; // location to blocks
-	int root_inode_idx; //root inode index this is the index of the root directory, rootdir is an inode,
-
+	size_t ibitmap_location; // offset of inode bitmap
+	size_t bbitmap_location; // offset of block bitmap
+	size_t inodes; // offset of inodes
+    size_t iblocks; // offset of iblocks
+	int root_inode_idx; //root inode index this is the index of the root directory
 } superblock;
 
 extern superblock* sprblk;

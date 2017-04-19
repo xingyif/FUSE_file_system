@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <sys/mman.h>
 //#include "superblock.h"
 //#include "directory.h"
 
@@ -17,6 +20,7 @@ typedef struct file_data {
     int         mode;
     const char* data;
 } file_data;
+const int DISK_SIZE  = 1024 * 1024; // 1MB
 
 // todo when to put metadata to inode & when to put data to iblock???
 //static file_data file_table[] = {
@@ -27,41 +31,63 @@ typedef struct file_data {
 
 
 // todo nufs.c should still call storage_init in main
-void
-storage_init(char* path)
-{ 
-    // initialize superblock
-	superblock_init();
+void*
+storage_init(char* disk_image)
+{
+    int fd;
+    if ((fd = open(disk_image, O_RDWR)) < 0) {
+        perror("Opening disk image failed!");
+        exit(1);
+    }
+    // returns a non-negative integer, termed a file descriptor.  It returns -1 on failure, and sets
+    // errno to indicate the error return - value if failed
+    void* disk = mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    // initialize superblock if it has never been initialized before
+    if (sprblk == NULL) {
+	    superblock_init();
+    }
+
+    sprblk = (superblock *) disk;
+
     // bitmaps initilized, fixed sized in storage.h
     // inodes initilized, fixed sized in storage.h
     // iblocks initilized, fixed sized in storage.h
     // create the root dir and put it to inodes and iblocks
-printf("given path: %s\n", path);   
- slist* path_list = s_split(path, '/'); // todo get home dir from array
-    //  char* path_array = slist_close(path_list);
-	while(path_list != NULL) {
-	printf("home path: %s\n", path_list->data);   
-	path_list = path_list->next;
-}
- directory* root_dir = directory_init(path_list->data); // return the 0 index from the arr
+    printf("Store file system data in: %s\n", disk_image);
+    printf("Disk address is at: %p\n", disk);
+
+    return disk;
+
+
+    // todo! ATTENTION: shouldn't be creating root_dir here
+    // storage_init only init superblock if it doesn't exist already
+
+
+
+//    slist* path_list = s_split(path, '/'); // todo get home dir from array
+    // \\\\\\ char* path_array = slist_close(path_list);
+//	while(path_list != NULL) {
+//	printf("home path: %s\n", path_list->data);
+//	path_list = path_list->next;
+//}
+    // \\\\\\ directory* root_dir = directory_init(path_list->data); // return the 0 index from the arr
 	//todo check the size to put in here
-    inode* root_inode = inode_init(S_IRWXU | S_IRWXG | S_IRWXO, 0, 128);
-    // iblock* root_iblock = iblock_init();
+//    inode* root_inode = inode_init(S_IRWXU | S_IRWXG | S_IRWXO, 0, 128);
+    // \\\\\\ iblock* root_iblock = iblock_init();
 
-    // int rv_inode = inode_insert(root_inode, inodes, inode_bitmap);
-    inodes[sprblk->root_inode_idx] = root_inode;
-    // make sure the inode is inserted into index 0 in inodes
-    // assert(rv_inode == 0);
+    // \\\\\\ int rv_inode = inode_insert(root_inode, inodes, inode_bitmap);
+//    inodes[sprblk->root_inode_idx] = root_inode;
+    // \\\\\\ make sure the inode is inserted into index 0 in inodes
+    // \\\\\\  assert(rv_inode == 0);
 
-    // int rv_iblock = iblock_insert(root_dir, iblocks, iblock_bitmap);
-    iblocks[sprblk->root_inode_idx] = root_dir;
-    // assure that root_dir is inserted at index 0 in iblocks
-    // assert(rv_iblock == 0);
+    // \\\\\\\ int rv_iblock = iblock_insert(root_dir, iblocks, iblock_bitmap);
+//    iblocks[sprblk->root_inode_idx] = root_dir;
+    // \\\\\\\ assure that root_dir is inserted at index 0 in iblocks
+    // \\\\\\\ assert(rv_iblock == 0);
 
     // mark the root inode & block to be used
-    inode_bitmap[sprblk->root_inode_idx] = 1;
-    iblock_bitmap[sprblk->root_inode_idx] = 1;
-    printf("TODO: Store file system data in: %s\n", path);
+//    inode_bitmap[sprblk->root_inode_idx] = 1;
+//    iblock_bitmap[sprblk->root_inode_idx] = 1;
 }
 
 void*
@@ -76,7 +102,8 @@ get_entry_block(char* path) {
     //todo assuming that user is giving path that either starts with home dir or entry in home dir
     if(streq(path_list->data, cur_dir->dir_name)) { //is the user's path starting from this directory or an entry in it
         path_list = path_list->next;
-    }/*
+    }
+    /*
     else {//todo ask prof tuck if this oki
 	printf("current directory: %s\n", cur_dir->dir_name);
 	printf("path list: %s\n", path_list->data);

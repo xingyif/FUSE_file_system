@@ -17,21 +17,29 @@
 //import pages
 //import inode
 
-const int SUPERBLOCK_SIZE  = 1024 * 1024; // 1MB
-
-superblock* sprblk;
 
 void
 superblock_init()
 {
-	sprblk = malloc(SUPERBLOCK_SIZE); // mmap(0, SUPERBLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, -1, 0);
-    assert(sprblk != 0);
-	sprblk->ibitmap_location = &inode_bitmap;
-	sprblk->bbitmap_location = &iblock_bitmap;
-	sprblk->num_of_inodes = 256;
-    sprblk->num_of_blocks = 256;
-    sprblk->inodes = &inodes;
-    sprblk->blocks = &iblocks;
+    // offset for the superblock
+    size_t offset = 0;
+
+    // offset for inode_bitmap
+    offset += sizeof(superblock);
+    sprblk->ibitmap_location = offset;
+
+    // offset for iblock_bitmap
+    offset += 256 * sizeof(char); // use char => 1byte, int => 8bytes, saves space in "disk"
+    sprblk->bbitmap_location = offset;
+
+    // offset for inodes
+    offset += 256 * sizeof(char); // use char => 1byte, int => 8bytes, saves space in "disk"
+    sprblk->inodes = offset;
+
+    // offset for iblocks
+    offset += 256 * sizeof(inode);
+    sprblk->iblocks = offset;
+
 	sprblk->root_inode_idx = 0;
 }
 
@@ -39,6 +47,7 @@ void
 superblock_free()
 {
    // int rv = munmap(pages_base, NUFS_SIZE);
+    // todo close?
    // assert(rv == 0);
 }
 
