@@ -1,18 +1,7 @@
 
 #include <string.h>
 
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <assert.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "superblock.h"
-#include "storage.h"
 //import blocks
 //import pages
 //import inode
@@ -84,5 +73,8 @@ superblock_add_inode(const char* path) {
 //mark in bitmap that free location is used
 }
 
-
+superblock*
+superblock_addr() {
+    return (superblock*) disk;
+}
 

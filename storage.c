@@ -31,7 +31,7 @@ const int DISK_SIZE  = 1024 * 1024; // 1MB
 
 
 // todo nufs.c should still call storage_init in main
-void*
+void
 storage_init(char* disk_image)
 {
     int fd;
@@ -41,13 +41,12 @@ storage_init(char* disk_image)
     }
     // returns a non-negative integer, termed a file descriptor.  It returns -1 on failure, and sets
     // errno to indicate the error return - value if failed
-    void* disk = mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    disk = mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     // initialize superblock if it has never been initialized before
-    if (sprblk == NULL) {
+    if (sprblk->ibitmap_location == NULL) {
 	    superblock_init();
     }
 
-    sprblk = (superblock *) disk;
 
     // bitmaps initilized, fixed sized in storage.h
     // inodes initilized, fixed sized in storage.h
@@ -56,7 +55,6 @@ storage_init(char* disk_image)
     printf("Store file system data in: %s\n", disk_image);
     printf("Disk address is at: %p\n", disk);
 
-    return disk;
 
 
     // todo! ATTENTION: shouldn't be creating root_dir here

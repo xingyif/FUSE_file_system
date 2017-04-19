@@ -24,5 +24,6 @@ void   superblock_init();
 void   superblock_free();
 void   print_superblock(superblock* superblock);
 void superblock_add_inode(const char* path);
+superblock* superblock_addr();
 #endif
 
