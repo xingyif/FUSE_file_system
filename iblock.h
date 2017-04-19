@@ -15,4 +15,5 @@ int iblock_insert(void* cur_iblock, void* iblocks[], int iblock_bitmap[]);
 int iblock_bitmap_find_next_empty(int iblock_bitmap[]);
 //void print_inode(inode* node);
 void** iblocks_addr();
+int* iblock_bitmap_addr();
 #endif

@@ -73,3 +73,8 @@ inode_bitmap_find_next_empty(int inode_bitmap[])
 inode* inodes_addr() {
     return (inode*) (disk + sprblk->inodes);
 }
+
+int*
+inode_bitmap_addr() {
+    return (int*) (disk + sprblk->ibitmap_location);
+}

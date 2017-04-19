@@ -83,3 +83,8 @@ iblocks_addr() {
     return (void**) disk + sprblk->iblocks;
 }
 
+int*
+iblock_bitmap_addr() {
+    return (int*) disk + sprblk->bbitmap_location;
+}
+
