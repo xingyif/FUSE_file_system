@@ -15,8 +15,6 @@
 #include "superblock.h"
 //#include "util.h"
 
-superblock* superblk;
-// haha changed it, we are going to have a merge conflict
 
 // implementation for: man 2 access
 // Checks if a file exists.
@@ -24,7 +22,7 @@ int
 nufs_access(const char *path, int mask)
 {
     printf("access(%s, %04o)\n", path, mask); // debugging purpose
-    if (get_entry_block(path) == NULL) {
+    if (get_entry_index(path) == NULL) {
         return -ENOENT; // path doesn't exist
     }
     // todo check u_id? return -EACCESS if the requested permission isn't available?????
