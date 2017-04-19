@@ -41,18 +41,26 @@ storage_init(char* disk_image)
 {
     
 	printf("home path: %s\n", disk_image);
-    pages_init(disk_image);/*
+   // pages_init(disk_image);
+
+
+
+
 int fd;
-    if ((fd = open(disk_image, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR)) == -1) {
+    if ((fd = open(disk_image, O_CREAT | O_RDWR, 0644)) == -1) {
         perror("Opening disk image failed!");
         exit(1);
     }
         perror("? ");
 	printf("file descriptor maid\n");
+
+	int rv = ftruncate(fd, DISK_SIZE);
+assert(rv == 0);
+
     // returns a non-negative integer, termed a file descriptor.  It returns -1 on failure, and sets
     // errno to indicate the error return - value if failed
     // initialize superblock if it has never been initialized before
-    disk = mmap(NULL, 41,PROT_EXEC | PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    disk = mmap(NULL, DISK_SIZE , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (disk == MAP_FAILED) {
       perror("Couldn't map image");
       exit(1);
