@@ -94,6 +94,7 @@ nufs_mkdir(const char *path, mode_t mode)
     // inode_init
     inode* cur_inode = inode_init(mode, 0, 0); // not file, size = 0
     // inode insert
+	// Brett is making a comment
     int rv_inode = inode_insert(cur_inode, inodes, inode_bitmap);
     assert(rv_inode >= 0);
     // iblock init
