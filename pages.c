@@ -14,6 +14,7 @@
 #include "pages.h"
 #include "slist.h"
 #include "util.h"
+#include "superblock.h"
 
 const int NUFS_SIZE  = 1024 * 1024; // 1MB
 const int PAGE_COUNT = 256;
@@ -32,6 +33,7 @@ pages_init(const char* path)
 
     pages_base = mmap(0, NUFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, pages_fd, 0);
     assert(pages_base != MAP_FAILED);
+    superblock_init(pages_base);
 }
 
 void

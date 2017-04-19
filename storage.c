@@ -17,6 +17,8 @@
 #include "util.h"
 //#include "iblock.h"
 #include "storage.h"
+#include "pages.h"
+
 typedef struct file_data {
     const char* path;
     int         mode;
@@ -39,6 +41,7 @@ storage_init(char* disk_image)
 {
     
 	printf("home path: %s\n", disk_image);
+    pages_init(disk_image);/*
 int fd;
     if ((fd = open(disk_image, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR)) == -1) {
         perror("Opening disk image failed!");
@@ -62,7 +65,7 @@ int fd;
 //    if (superblock_addr()->ibitmap_location == NULL) { // todo ? check a field, because sprblk_addr = disk
 	printf("superblock making time\n");
 	    superblock_init(disk);
-//    }
+//    }*/
 
 
     // bitmaps initilized, fixed sized in storage.h
