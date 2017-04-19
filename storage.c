@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <errno.h>
 //#include "superblock.h"
 //#include "directory.h"
@@ -35,8 +36,9 @@ const int DISK_SIZE  = 1024 * 1024; // 1MB
 void
 storage_init(char* disk_image)
 {
+	printf("home path: %s\n", disk_image);
     int fd;
-    if ((fd = open(disk_image, O_RDWR)) < 0) {
+    if ((fd = open(disk_image,O_CREAT | O_RDWR)) == -1) {
         perror("Opening disk image failed!");
         exit(1);
     }
