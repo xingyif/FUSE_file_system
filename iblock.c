@@ -81,11 +81,11 @@ print_node(inode* node)
 */
 void**
 iblocks_addr() {
-    return (void**) disk + sprblk->iblocks;
+    return (void**) get_disk() + superblock_addr()->iblocks;
 }
 
 int*
 iblock_bitmap_addr() {
-    return (int*) disk + sprblk->bbitmap_location;
+    return (int*) get_disk() + superblock_addr()->bbitmap_location;
 }
 

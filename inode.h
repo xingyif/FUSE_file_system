@@ -1,3 +1,6 @@
+#ifndef INODE_H
+#define INODE_H
+
 #include <stdio.h>
 //#include <ntsid.h>
 #include <stddef.h>
@@ -22,3 +25,5 @@ int inode_insert(inode* cur_inode, inode* inodes[], int inode_bitmap[]);
 int inode_bitmap_find_next_empty(int inode_bitmap[]);
 inode* inodes_addr();
 int* inode_bitmap_addr();
+
+#endif

@@ -1,12 +1,12 @@
 #include "inode.h"
-//#include "storage.h"
+#include "storage.h"
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
-//#include "superblock.h"
+#include "superblock.h"
 int ROOT_DIR_IDX = 0;
 
 //sprblk = superblock_addr();
@@ -71,12 +71,12 @@ inode_bitmap_find_next_empty(int inode_bitmap[])
     // return a value >= 0 if success, else return -ENOMEM for failure
     return inode_index;
 }
-/*
+
 inode* inodes_addr() {
-    return (inode*) (disk + sprblk->inodes);
+    return (inode*) (get_disk() + superblock_addr()->inodes);
 }
 
 int*
 inode_bitmap_addr() {
-    return (int*) (disk + sprblk->ibitmap_location);
-}*/
+    return (int*) (get_disk() + superblock_addr()->ibitmap_location);
+}

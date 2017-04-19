@@ -23,7 +23,8 @@ typedef struct file_data {
     const char* data;
 } file_data;
 const int DISK_SIZE  = 1024 * 1024; // 1MB
-
+void* disk;
+//superblock* sprblk;
 // todo when to put metadata to inode & when to put data to iblock???
 //static file_data file_table[] = {
 //    {"/", 040755, 0},
@@ -36,23 +37,32 @@ const int DISK_SIZE  = 1024 * 1024; // 1MB
 void
 storage_init(char* disk_image)
 {
+    
 	printf("home path: %s\n", disk_image);
-    int fd;
+int fd;
     if ((fd = open(disk_image, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR)) == -1) {
         perror("Opening disk image failed!");
         exit(1);
     }
+        perror("? ");
+	printf("file descriptor maid\n");
     // returns a non-negative integer, termed a file descriptor.  It returns -1 on failure, and sets
     // errno to indicate the error return - value if failed
-    disk = mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     // initialize superblock if it has never been initialized before
-
+    disk = mmap(NULL, 41,PROT_EXEC | PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (disk == MAP_FAILED) {
+      perror("Couldn't map image");
+      exit(1);
+    }
+	printf("mmaped\n");
+//sprblk = (superblock *) disk;
 
 // Had to comment out to try and avoid this error
 
-    if (superblock_addr()->ibitmap_location == NULL) { // todo ? check a field, because sprblk_addr = disk
-	    superblock_init();
-    }
+//    if (superblock_addr()->ibitmap_location == NULL) { // todo ? check a field, because sprblk_addr = disk
+	printf("superblock making time\n");
+	    superblock_init(disk);
+//    }
 
 
     // bitmaps initilized, fixed sized in storage.h
@@ -187,3 +197,8 @@ get_data(char* path) // todo do we always assume the path is a file????????????
 //          return cur_dir->entries;
 //    }
 //}
+
+void*
+get_disk() {
+	return disk;
+}
