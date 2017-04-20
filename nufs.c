@@ -13,6 +13,7 @@
 
 #include "storage.h"
 #include "superblock.h"
+#include "util.h"
 //#include "util.h"
 
 
@@ -21,25 +22,36 @@
 int
 nufs_access(const char *path, int mask)
 {
-    // fixme what is mask ???????????????????????????????????????
     printf("access(%s, %04o)\n", path, mask); // debugging purpose
+    // checks if the path exists
     int index = get_entry_index(path);
-    if (index == NULL) {
+    if (index < 0) {
         return -ENOENT; // path doesn't exist
     }
-    mode_t mode = inodes_addr()[index].mode;
-    // check u_id? return -EACCESS if the requested permission isn't available
-    struct stat* st;
-    int rv = nufs_getattr(path, st);
-    assert(rv == 0);
 
-
-
-    uid_t cur_uid = st->st_uid;
-    // Read, write, execute/search by owner
-    if ((mode == S_IRWXU) && (cur_uid != getuid())) {
+    // get current user id
+    int cur_uid = getuid();
+    inode* cur_inode = inodes_addr()[index];
+    // current user is not the owner
+    if (cur_inode->user_id != cur_uid) {
+//        if ()
         return -EACCES;
     }
+
+    // Read, write, execute/search by owner
+
+    // check u_id? return -EACCESS if the requested permission isn't available
+//    struct stat* st;
+//    int rv = nufs_getattr(path, st);
+//    assert(rv == 0);
+//
+//
+//
+//    uid_t cur_uid = st->st_uid;
+//    // Read, write, execute/search by owner
+//    if ((mode == S_IRWXU) && (cur_uid != getuid())) {
+//        return -EACCES;
+//    }
     return 0; // success
 }
 
@@ -86,16 +98,29 @@ int
 nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 {
     // todo check if file already exist, if yes, return error
-    inode* cur_inode = inode_init(mode, 1, 0);
-    int rv_inode = inode_insert(cur_inode, inodes, inode_bitmap_addr());
-    assert(rv_inode >= 0);
 
-    directory* cur_dir = directory_init(slist_last(path));
-    int rv_iblock = iblock_insert(cur_dir, iblocks_addr(), iblock_bitmap_addr());
-    assert(rv_iblock >= 0);
+    int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
+    if (aval_idx < 0) {
+        return -1; // ENOMEM: operation failed due to lack of memory or disk space
+    }
+
+    // create the new inode ptr
+    inode* cur_inode = single_inode_addr(aval_idx);
+    // flush the inode ptr to disk
+    inodes_addr()[aval_idx] = cur_inode;
+    inode_init(cur_inode, mode, 1, 0);
+    // update inode_bitmap
+    inode_bitmap_addr()[aval_idx] = 1;
+
+    // create the new iblock ptr
+    iblock* cur_iblock = single_iblock_addr(aval_idx);
+    // flush the iblock ptr to disk
+    iblocks_addr()[aval_idx] = cur_iblock;
+    // update the iblock_bitmap
+    iblock_bitmap_addr()[aval_idx] = 1;
 
     printf("after mknod(%s, %04o)\n", path, mode);
-    return -1;
+    return 0;
 }
 
 // most of the following callbacks implement
@@ -104,16 +129,27 @@ int
 nufs_mkdir(const char *path, mode_t mode)
 {
     // todo check if dir already exist, if yes, return error
-    // inode_init
-    inode* cur_inode = inode_init(mode, 0, 0); // not file, size = 0
-    // inode insert
-    int rv_inode = inode_insert(cur_inode, inodes, inode_bitmap_addr());
-    assert(rv_inode >= 0);
-    // iblock init
-    directory* cur_dir = directory_init(slist_last(path));
-    // iblock insert
-    int rv_iblock = iblock_insert(cur_dir, iblocks_addr(), inode_bitmap_addr());
-    assert(rv_iblock >= 0);
+    int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
+    if (aval_idx < 0) {
+        return -1; // ENOMEM: operation failed due to lack of memory or disk space
+    }
+
+    // create the new inode ptr
+    inode* cur_inode = single_inode_addr(aval_idx);
+    // flush the inode ptr to disk
+    inodes_addr()[aval_idx] = cur_inode;
+    inode_init(cur_inode, mode, 1, 0);
+    // update inode_bitmap
+    inode_bitmap_addr()[aval_idx] = 1;
+
+    // create the new iblock ptr
+    directory* cur_dir = single_iblock_addr(aval_idx);
+
+    directory_init(cur_dir, slist_last(path)->data);
+    // flush the dir ptr to disk
+    iblocks_addr()[aval_idx] = cur_dir;
+    // update the iblock_bitmap
+    iblock_bitmap_addr()[aval_idx] = 1;
 
     printf("after mkdir(%s)\n", path);
     return -1;

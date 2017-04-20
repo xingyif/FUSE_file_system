@@ -141,7 +141,7 @@ printf("home path: %s\n", path_list->data);
     //  char* path_array = slist_close(path_list); don't need to use  slist_close returns a pointer to the array
     //todo check if user path starts at home else look at cur_dir path from home
     // fixme addr() returns ** because can't case void to directory
-    directory* cur_dir = (directory*) (iblocks_addr()[superblock_addr()->root_inode_idx]); // todo don't know if this works
+    directory* cur_dir = (directory*) (iblocks_addr()[superblock_addr()->root_inode_idx]);
     //todo assuming that user is giving path that either starts with home dir or entry in home dir
     if(streq(path_list->data, cur_dir->dir_name)) { //is the user's path starting from this directory or an entry in it
         path_list = path_list->next;
@@ -229,3 +229,6 @@ void*
 get_disk() {
 	return disk;
 }
+
+//void
+//flush_to_disk(void**)

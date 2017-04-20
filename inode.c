@@ -43,28 +43,28 @@ inode_remove(inode* inode_ptr) {
 
 // find an empty spot in inodes, insert the given inode, return the index of where the inode is stored or failure
 // fixme, this func shouldn't have any input, because you have excess to all the addrs
-int
-inode_insert(inode* cur_inode, inode* inodes[], int inode_bitmap[]) {
-    int next_aval_index = inode_bitmap_find_next_empty(inode_bitmap);
-    // Used for debugging printf("next index %d\n", next_aval_index);
-    if (next_aval_index < 0) {
-        // operation failed due to lack of memory or disk space
-        return next_aval_index;
-    }
-    inodes[next_aval_index] = cur_inode;
-    // update bitmap
-    inode_bitmap[next_aval_index] = 1;
-    // success should return an int >= 0
-    return next_aval_index;
-}
+//int
+//inode_insert(inode* cur_inode, inode* inodes[], int inode_bitmap[]) {
+//    int next_aval_index = inode_bitmap_find_next_empty(inode_bitmap);
+//    // Used for debugging printf("next index %d\n", next_aval_index);
+//    if (next_aval_index < 0) {
+//        // operation failed due to lack of memory or disk space
+//        return next_aval_index;
+//    }
+//    inodes[next_aval_index] = cur_inode;
+//    // update bitmap
+//    inode_bitmap[next_aval_index] = 1;
+//    // success should return an int >= 0
+//    return next_aval_index;
+//}
 
 
 int
-inode_bitmap_find_next_empty(int inode_bitmap[])
+inode_bitmap_find_next_empty(int* inode_bitmap_ptr)
 {
     int inode_index = -ENOMEM; // operation failed due to lack of memory or disk space
-    for (int ii = 1; ii < 256; ++ii) {
-        if (inode_bitmap[ii] == 0) { // if iblock is empty
+    for (int ii = 1; ii < 256; ii++) {
+        if (inode_bitmap_ptr[ii] == 0) { // if iblock is empty
             inode_index = ii;
             break;
         }
@@ -81,4 +81,9 @@ inodes_addr() {
 int*
 inode_bitmap_addr() {
     return (int*) (get_disk() + superblock_addr()->ibitmap_location);
+}
+
+void*
+single_inode_addr(int idx) {
+    return inodes_addr() + sizeof(inode) * idx;
 }

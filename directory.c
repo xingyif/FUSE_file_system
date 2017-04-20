@@ -9,7 +9,6 @@ const int DIR_ENT_SIZE  = 32;
 
 void
 directory_init(directory* cur_dir, char* name) {
-    // entries are fixed size array
 //	directory* dir = malloc(sizeof(directory));
     // todo check if the size of the char array is > 27
     if (sizeof(*name) > FILE_NAME_LENGTH) {
@@ -17,6 +16,7 @@ directory_init(directory* cur_dir, char* name) {
     }
     cur_dir->dir_name = name;
     cur_dir->number_of_entries = 0;
+    // entries are fixed size array
 }
 
 //look for the inode_index of an entry

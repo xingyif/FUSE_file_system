@@ -39,27 +39,27 @@ iblock_free(iblock* iblock_ptr)
     free(iblock_ptr); // munmap(iblock_ptr, IBLOCK_SIZE);
 }
 
-// find an empty spot in iblocks, insert the given iblock, return the index of where the iblock is stored or failure
-int
-iblock_insert(void* cur_iblock, void* iblocks[], int iblock_bitmap[])
-{
-    int next_aval_index = iblock_bitmap_find_next_empty(iblock_bitmap);
-    if (next_aval_index < 0) {
-        // operation failed due to lack of memory or disk space
-        return next_aval_index;
-    }
-    iblocks[next_aval_index] = cur_iblock;
-    // update bitmap
-    iblock_bitmap[next_aval_index] = 1;
-    return next_aval_index;
-}
+//// find an empty spot in iblocks, insert the given iblock, return the index of where the iblock is stored or failure
+//int
+//iblock_insert(void* cur_iblock, void* iblocks[], int iblock_bitmap[])
+//{
+//    int next_aval_index = iblock_bitmap_find_next_empty(iblock_bitmap);
+//    if (next_aval_index < 0) {
+//        // operation failed due to lack of memory or disk space
+//        return next_aval_index;
+//    }
+//    iblocks[next_aval_index] = cur_iblock;
+//    // update bitmap
+//    iblock_bitmap[next_aval_index] = 1;
+//    return next_aval_index;
+//}
 
 int
-iblock_bitmap_find_next_empty(int iblock_bitmap[])
+iblock_bitmap_find_next_empty(int* iblock_bitmap_ptr)
 {
     int iblock_index = -ENOMEM; // opration failed due to lack of memory/disk space
     for (int ii = 1; ii < IBLOCK_COUNT; ++ii) {
-        if (iblock_bitmap[ii] == 0) { // if iblock is empty
+        if (iblock_bitmap_ptr[ii] == 0) { // if iblock is empty
             iblock_index = ii;
             break;
         }
@@ -90,3 +90,7 @@ iblock_bitmap_addr() {
     return (int*) get_disk() + superblock_addr()->bbitmap_location;
 }
 
+void*
+single_iblock_addr(int idx) {
+    return iblocks_addr() + 4096 * idx;
+}
