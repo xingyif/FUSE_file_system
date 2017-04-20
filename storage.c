@@ -190,7 +190,7 @@ get_stat(char* path, struct stat* st)
     st->st_uid  = cur_inode->user_id;
     st->st_mode = cur_inode->mode;
 
-    st->st_size = cur_inode->size_of;g
+    st->st_size = cur_inode->size_of;
     return 0;
 }
 
