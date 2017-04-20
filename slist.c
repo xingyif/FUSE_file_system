@@ -61,3 +61,11 @@ s_split(const char* text, char delim)
     return s_cons(part, rest);
 }
 
+slist*
+slist_last(slist *list) {
+    while(list->next != NULL) {
+        list = list->next;
+}
+    return list;
+}
+

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "directory.h"
-
+#include "slist.h"
 const int FILE_NAME_LENGTH  = 27;
 const int DIR_ENT_SIZE  = 32;
 

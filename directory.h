@@ -1,7 +1,9 @@
+#ifndef DIRECTORY_H
+#define DIRECTROY_H
 // created by Yifan 4/14/17
 
 
-#include "slist.h"
+//#include "slist.h"
 
 typedef struct dir_ent {
 	char* filename; //Entry path
@@ -23,3 +25,5 @@ int directory_insert_entry(directory* dir, char* name, int inode_index); //given
 int directory_del_entry(directory* dir, char* name); //delete an entry in a directory
 //slist* directory_list(const char* path);// for the tree: puts a path into slist format
 //void print_directory(directory dd);
+
+#endif

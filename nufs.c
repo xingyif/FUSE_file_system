@@ -14,9 +14,10 @@
 #include "storage.h"
 #include "superblock.h"
 #include "util.h"
-//#include "util.h"
-
-
+#include "iblock.h"
+#include "inode.h"
+#include "slist.h"
+#include "directory.h"
 // implementation for: man 2 access
 // Checks if a file exists.
 int
@@ -30,13 +31,13 @@ nufs_access(const char *path, int mask)
     }
 
     // get current user id
-    int cur_uid = getuid();
-    inode* cur_inode = inodes_addr()[index];
+//    int cur_uid = getuid();
+  //  inode* cur_inode = inodes_addr()[index];
     // current user is not the owner
-    if (cur_inode->user_id != cur_uid) {
+  //  if (cur_inode->user_id != cur_uid) {
 //        if ()
-        return -EACCES;
-    }
+    //    return -EACCES;
+   // }
 
     // Read, write, execute/search by owner
 
@@ -147,9 +148,9 @@ nufs_mkdir(const char *path, mode_t mode)
 
     directory_init(cur_dir, slist_last(path)->data);
     // flush the dir ptr to disk
-    iblocks_addr()[aval_idx] = cur_dir;
+//    iblocks_addr()[aval_idx] = cur_dir;
     // update the iblock_bitmap
-    iblock_bitmap_addr()[aval_idx] = 1;
+  //  iblock_bitmap_addr()[aval_idx] = 1;
 
     printf("after mkdir(%s)\n", path);
     return -1;

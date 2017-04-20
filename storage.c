@@ -11,14 +11,15 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <errno.h>
-//#include "superblock.h"
-//#include "directory.h"
 
+#include "directory.h"
+#include "superblock.h"
+#include "inode.h"
 #include "util.h"
-//#include "iblock.h"
+#include "iblock.h"
 #include "storage.h"
 #include "pages.h"
-
+#include "slist.h"
 typedef struct file_data {
     const char* path;
     int         mode;
@@ -86,18 +87,33 @@ assert(rv == 0);
     superblock* sprblk_addr = superblock_addr();
     int root_dir_idx = sprblk_addr->root_inode_idx;
     // get inode* from inodes
-    inode* root_inode = inodes_addr()[root_dir_idx];
-    inode_init(root_inode, S_IRWXU | S_IRWXG | S_IRWXO, 0, 128);
+    inode* root_inode = single_inode_addr(root_dir_idx);
+    
+    printf("root inode is: %p\n", root_inode);
+inodes_addr()[root_dir_idx] = root_inode;
+    inode_init(root_inode, S_IRWXU | S_IRWXG | S_IRWXO, 0, 0);
+
+printf("root inode pointer 2 is: %p\n", single_inode_addr(0));
+
+
     // update inode* in inodes
-    inodes_addr()[root_dir_idx] = root_inode;
+    inode_bitmap_addr()[root_dir_idx] = 1;
+
+printf("root inode pointer 1 is: %p\n", inodes_addr()[root_dir_idx]);
+    
+    //creating iblock root_dir here
+    directory* root_iblock = single_iblock_addr(root_dir_idx);
+    iblocks_addr()[root_dir_idx] = root_iblock;
+    
+    char* root_dir_name = '/'; //is it mnt or '/'
+    // get dir* from iblocks and initialize the root_dir
+    directory_init(root_iblock, root_dir_name);
+    iblock_bitmap_addr()[root_dir_idx] = 1;
+printf("root inode pointer is: %p\n", inodes_addr()[root_dir_idx]);
 
     // setting up root_dir block
-    void* root_directory = iblocks_addr()[root_dir_idx];
-    char* root_dir_name = "/mnt";
-    // get dir* from iblocks and initialize the root_dir
-    directory_init(root_directory, root_dir_name);
     // update dir* in iblocks
-    iblocks_addr()[root_dir_idx] = root_directory;
+    
 
 
 //    slist* path_list = s_split(path, '/'); // todo get home dir from array
@@ -186,7 +202,7 @@ get_stat(char* path, struct stat* st)
     // write sizeof(stat) bytes of 0 to st
     memset(st, 0, sizeof(struct stat));
 
-    inode* cur_inode = inodes_addr()[index];
+    inode* cur_inode = (inode*) single_inode_addr(index);
     st->st_uid  = cur_inode->user_id;
     st->st_mode = cur_inode->mode;
 
