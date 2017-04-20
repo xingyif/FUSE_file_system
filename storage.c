@@ -186,11 +186,11 @@ get_stat(char* path, struct stat* st)
     // write sizeof(stat) bytes of 0 to st
     memset(st, 0, sizeof(struct stat));
 
-    inode cur_inode = inodes_addr()[index];
-    st->st_uid  = cur_inode.user_id;
-    st->st_mode = cur_inode.mode;
+    inode* cur_inode = inodes_addr()[index];
+    st->st_uid  = cur_inode->user_id;
+    st->st_mode = cur_inode->mode;
 
-    st->st_size = cur_inode.size_of;
+    st->st_size = cur_inode->size_of;g
     return 0;
 }
 
