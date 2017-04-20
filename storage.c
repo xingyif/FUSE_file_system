@@ -163,9 +163,11 @@ get_entry_index(char *path) {
     //  char* path_array = slist_close(path_list); don't need to use  slist_close returns a pointer to the array
     //todo check if user path starts at home else look at cur_dir path from home
     // fixme addr() returns ** because can't case void to directory
-    directory *cur_dir = (directory *) (iblocks_addr()[superblock_addr()->root_inode_idx]);
+    int current_inode_idx = superblock_addr()->root_inode_idx;
+    directory *root_dir = (directory *) (iblocks_addr()[current_inode_idx]);
     //todo assuming that user is giving path that either starts with home dir or entry in home dir
-    if (streq(path_list->data, cur_dir->dir_name)) { //is the user's path starting from this directory or an entry in it
+    // get to the name we are looking for
+    if (streq(path_list->data, root_dir->dir_name)) {
         path_list = path_list->next;
     }
     /*
@@ -174,24 +176,71 @@ get_entry_index(char *path) {
 	printf("path list: %s\n", path_list->data);
         perror("user must give path that starts from home\n");
     }*/
+    directory* current = root_dir;
     while (path_list != NULL) {
-        int entry_inode_index = directory_lookup(cur_dir, path_list->data);
-        if (entry_inode_index == -1) {
-            // perror("can't find block\n");
-            return -ENOENT;
-        } else {
-            dir_ent *cur_entry = cur_dir->entries[entry_inode_index];
-            if (streq(cur_entry->filename, path_list->data)) {
-                return cur_entry->entry_inode_index;
-            } else {
-                cur_dir = (directory *) iblocks_addr()[entry_inode_index];
-                path_list = path_list->next;
-            }
+        // get the index of the entry
+        int entry_idx = directory_entry_lookup(current, path_list->data);
+        // didn't find the entry
+        if (entry_idx < 0) {
+            return -ENOENT; // no such file or dir
         }
+        // get current entry from current dir
+        dir_ent* cur_ent = current->entries[entry_idx];
+        int entry_inode_index = cur_ent->entry_inode_index;
+
+        // find the file
+        if (path_list->next == NULL) {
+            return cur_ent->entry_inode_index;
+        } else {
+            // current is not a file
+            current = iblocks_addr()[entry_inode_index];
+            path_list = path_list->next;
+        }
+
     }
 
     return -ENOENT;
 }
+
+//int
+//add_dir_entry(char* path, char* new_name, int new_inode_idx) {
+//    slist *path_list = s_split(path, '/');
+//    directory *cur_dir = (directory *) (iblocks_addr()[superblock_addr()->root_inode_idx]);
+//
+//    //is the user's path starting from this directory or an entry in it
+//    if (streq(path_list->data, cur_dir->dir_name)) {
+//        path_list = path_list->next;
+//    }
+//
+//    while (path_list != NULL) {
+//        // get the index of the entry
+//        int entry_idx = directory_entry_lookup(cur_dir, path_list->data);
+//        // didn't find the entry
+//        if (entry_idx < 0) {
+//            // put the new entry to cur_dir
+//            // todo not sure if ?????????????????????????????????????????? this works ??????????????????????????????????????????
+//            dir_ent* new_entry = cur_dir;
+//            new_entry->filename = new_name;
+//            new_entry->entry_inode_index = new_inode_idx;
+//            cur_dir->number_of_entries++;
+//            return 0; // success
+//        }
+//        if (entry_inode_index == -1) {
+//            // no such file or dir
+//            return -ENOENT;
+//        } else {
+//            dir_ent *cur_entry = cur_dir->entries[entry_inode_index];
+//            if (streq(cur_entry->filename, path_list->data)) {
+//                return cur_entry->entry_inode_index;
+//            } else {
+//                cur_dir = (directory *) iblocks_addr()[entry_inode_index];
+//                path_list = path_list->next;
+//            }
+//        }
+//    }
+//
+//
+//}
 
 int
 get_stat(char *path, struct stat *st) {

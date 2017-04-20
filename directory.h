@@ -17,7 +17,7 @@ typedef struct directory {
 } directory;
 
 void directory_init(directory* cur_dir, char* name);
-int directory_lookup(directory* dir, char* name); //look for the inode_index of an entry
+int directory_entry_lookup(directory* dir, char* name); //look for the inode_index of an entry
 //int tree_lookup_inum(const char* path);
 // maybe have a tree look up for slist?
 int directory_insert_entry(directory* dir, char* name, int inode_index); //given a directory, name of entry,

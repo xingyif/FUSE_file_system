@@ -101,7 +101,8 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev)
         return -EEXIST; // path already exist
     }
 
-    // todo add_entry
+    // add the new entry to the current dir
+//    add_dir_entry()
 
     int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
     if (aval_idx < 0) {

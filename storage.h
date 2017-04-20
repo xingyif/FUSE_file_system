@@ -16,6 +16,7 @@
 
 void storage_init(char* path);
 int get_entry_index(char *path);
+//void add_dir_entry(directory* cur_dir, char* new_name, int new_inode_idx);
 int         get_stat(char* path, struct stat* st);
 const char* get_data(char* path);
 void* get_disk();
