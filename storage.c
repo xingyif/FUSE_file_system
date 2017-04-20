@@ -131,7 +131,13 @@ get_entry_index(char *path) {
     // 1. truncate path
     // 2. get inodes
     // 3. get iblocks
+if (*path == '/') {
+printf("home dir\n");
+return 0;
+}
     slist* path_list = s_split(path, '/');//  get given dir/file from array
+printf("home path: %s\n", path_list->data); 
+
     //  char* path_array = slist_close(path_list); don't need to use  slist_close returns a pointer to the array
     //todo check if user path starts at home else look at cur_dir path from home
     // fixme addr() returns ** because can't case void to directory
