@@ -94,11 +94,14 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 int
 nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 {
+    printf("in nufs_mknod:(%s, %04o)\n", path, mode);
     // checks if the path exists
     int index = get_entry_index(path);
-    if (index < 0) {
-        return -ENOENT; // path doesn't exist
+    if (index >= 0) {
+        return -EEXIST; // path already exist
     }
+
+    // todo add_entry
 
     int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
     if (aval_idx < 0) {
@@ -131,14 +134,18 @@ nufs_mkdir(const char *path, mode_t mode)
 {
     // checks if the path exists
     int index = get_entry_index(path);
-    if (index < 0) {
-        return -ENOENT; // path doesn't exist
+    if (index >= 0) {
+        return -EEXIST; // path already exists
     }
 
     int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
     if (aval_idx < 0) {
         return -1; // ENOMEM: operation failed due to lack of memory or disk space
     }
+
+    // todo add_entry(dir* cur_dir, name, inode_index)
+    // check iblock, if entry does not exist, then create it and put it to the given dir
+    //
 
     // create the new inode ptr
     inode* cur_inode = single_inode_addr(aval_idx);
@@ -152,7 +159,7 @@ nufs_mkdir(const char *path, mode_t mode)
     directory* cur_dir = single_iblock_addr(aval_idx);
 
     directory_init(cur_dir, slist_last(path)->data);
-    // flush the dir ptr to disk
+    // todo why comment out????? flush the dir ptr to disk
 //    iblocks_addr()[aval_idx] = cur_dir;
     // update the iblock_bitmap
   //  iblock_bitmap_addr()[aval_idx] = 1;
@@ -178,7 +185,7 @@ nufs_rmdir(const char *path)
         return -1; // ENOENT: path doesn't exist
     }
 
-    // remove inode, and remove iblock at the given index
+    // remove inode, and remove iblock_ptrs at the given index
     inodes_addr()[index] = NULL;
     iblocks_addr()[index] = NULL;
     // update the bitmaps
@@ -193,15 +200,45 @@ nufs_rmdir(const char *path)
 int
 nufs_rename(const char *from, const char *to)
 {
-    // todo access
+    // todo should i call access
     printf("rename(%s => %s)\n", from, to);
     // checks if the path exists
-    int index = get_entry_index(from);
-    if (index < 0) {
+    int from_index = get_entry_index(from);
+    if (from_index < 0) {
         return -1; // ENOENT: path doesn't exist
     }
-    inode* cur_inode = inodes_addr()[index];
-    // todo continue...
+
+    int to_index = get_entry_index(to);
+    // todo??? it is safe to inlcude 0=> root
+    // if to exists, then remove it first
+    if (to_index >= 0) {
+
+    }
+
+
+
+    // if two names are the same, do nothing
+    if (strcmp(from, to) == 0) {
+        return 0;
+    }
+
+    inode* from_inode = inodes_addr()[from_index];
+    iblock* from_iblock = iblocks_addr()[from_index];
+
+    // create inode & iblock for to
+    inode* to_inode = single_inode_addr(to_index);
+
+
+    // both from and to must be the same type either file/dir
+
+
+//    EISDIR // new is a directory, but old is not a directory.
+//
+//    ENOTDIR // old is a directory, but new is not a directory.
+//    // if to exists, then it is removed/replaced
+//
+
+
 
     return -1;
 }
