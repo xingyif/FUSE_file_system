@@ -176,11 +176,12 @@ printf("home path: %s\n", path_list->data);
 int
 get_stat(char* path, struct stat* st)
 {
-
+    printf("in get_stat\n");
     int index = get_entry_index(path);
     if (index < 0) {
         // didn't find the given path
         //todo perror&exit or return errorCode????????????????
+        printf("in get_stat, about to return ENOENT, because given path doesn't exist\n");
         return -ENOENT; // TODO included <errno.h>
     }
     // write sizeof(stat) bytes of 0 to st

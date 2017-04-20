@@ -22,6 +22,7 @@
 int
 nufs_access(const char *path, int mask)
 {
+    // todo doesn't differentiate owner, group, other, if not == user, return error
     printf("access(%s, %04o)\n", path, mask); // debugging purpose
     // checks if the path exists
     int index = get_entry_index(path);
@@ -34,24 +35,18 @@ nufs_access(const char *path, int mask)
     inode* cur_inode = inodes_addr()[index];
     // current user is not the owner
     if (cur_inode->user_id != cur_uid) {
-//        if ()
         return -EACCES;
     }
-
+    // when cur_user == file owner
+    if (cur_inode->mode != mask) {
+        return -EACCES;
+    }
     // Read, write, execute/search by owner
 
     // check u_id? return -EACCESS if the requested permission isn't available
 //    struct stat* st;
 //    int rv = nufs_getattr(path, st);
 //    assert(rv == 0);
-//
-//
-//
-//    uid_t cur_uid = st->st_uid;
-//    // Read, write, execute/search by owner
-//    if ((mode == S_IRWXU) && (cur_uid != getuid())) {
-//        return -EACCES;
-//    }
     return 0; // success
 }
 
@@ -61,6 +56,7 @@ int
 nufs_getattr(const char *path, struct stat *st)
 {
     printf("In getattr(%s)\n", path); // debugging purpose
+    // get_stat will check if file/dir exist
     int rv = get_stat(path, st);
     if (rv == -1) {
         return -ENOENT; // path doesn't exist
@@ -97,7 +93,11 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 int
 nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 {
-    // todo check if file already exist, if yes, return error
+    // checks if the path exists
+    int index = get_entry_index(path);
+    if (index < 0) {
+        return -ENOENT; // path doesn't exist
+    }
 
     int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
     if (aval_idx < 0) {
@@ -128,7 +128,12 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 int
 nufs_mkdir(const char *path, mode_t mode)
 {
-    // todo check if dir already exist, if yes, return error
+    // checks if the path exists
+    int index = get_entry_index(path);
+    if (index < 0) {
+        return -ENOENT; // path doesn't exist
+    }
+
     int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
     if (aval_idx < 0) {
         return -1; // ENOMEM: operation failed due to lack of memory or disk space
@@ -166,7 +171,20 @@ int
 nufs_rmdir(const char *path)
 {
     printf("rmdir(%s)\n", path);
-    return -1;
+    // checks if the path exists
+    int index = get_entry_index(path);
+    if (index < 0) {
+        return -1; // ENOENT: path doesn't exist
+    }
+
+    // remove inode, and remove iblock at the given index
+    inodes_addr()[index] = NULL;
+    iblocks_addr()[index] = NULL;
+    // update the bitmaps
+    inode_bitmap_addr()[index] = 0;
+    iblock_bitmap_addr()[index] = 0;
+
+    return 0; // success
 }
 
 // implements: man 2 rename
@@ -174,7 +192,16 @@ nufs_rmdir(const char *path)
 int
 nufs_rename(const char *from, const char *to)
 {
+    // todo access
     printf("rename(%s => %s)\n", from, to);
+    // checks if the path exists
+    int index = get_entry_index(from);
+    if (index < 0) {
+        return -1; // ENOENT: path doesn't exist
+    }
+    inode* cur_inode = inodes_addr()[index];
+    // todo continue...
+
     return -1;
 }
 

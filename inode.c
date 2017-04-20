@@ -30,6 +30,10 @@ inode_init(inode* cur_inode, mode_t mode, int is_file, size_t size) {
 //    inode* inode_ptr = malloc(sizeof(inode)); // mmap(0, sizeof(inode), PROT_READ | PROT_WRITE, MAP_SHARED, inode_fd, 0);
 //    assert(inode_ptr != MAP_FAILED);
 
+    // good default mode
+    // Directory: 040755
+    // Regular file: 0100644
+
     // todo, should inode contain file name
     cur_inode->user_id = getuid();
     cur_inode->mode = mode;
