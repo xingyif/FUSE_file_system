@@ -7,17 +7,16 @@
 const int FILE_NAME_LENGTH  = 27;
 const int DIR_ENT_SIZE  = 32;
 
-directory*
-directory_init(char* name) {
+void
+directory_init(directory* cur_dir, char* name) {
     // entries are fixed size array
-	directory* dir = malloc(sizeof(directory));
+//	directory* dir = malloc(sizeof(directory));
     // todo check if the size of the char array is > 27
     if (sizeof(*name) > FILE_NAME_LENGTH) {
         perror("Name of file/dir is too long!");
     }
-    dir->dir_name = name;
-    dir->number_of_entries = 0;
-	return dir;
+    cur_dir->dir_name = name;
+    cur_dir->number_of_entries = 0;
 }
 
 //look for the inode_index of an entry

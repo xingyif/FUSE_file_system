@@ -17,8 +17,8 @@ static int   iblock_fd   = -1;
 //static void* iblock_ptr =  0;
 //superblock sprblk = *superblock_addr(); 
 // initialize a single 4k block
-iblock*
-iblocks_init()
+void
+iblock_init(iblock* cur_block)
 {
 //    iblock_fd = open(path, O_CREAT | O_RDWR, 0644);
 //    assert(iblock_fd != -1);
@@ -27,9 +27,10 @@ iblocks_init()
 //    int rv = ftruncate(iblock_fd, NUFS_SIZE);
 //    assert(rv == 0); // success
 
-    iblock* iblock_ptr = malloc(IBLOCK_SIZE); // mmap(0, IBLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, iblock_fd, 0);
+//    iblock* iblock_ptr = malloc(IBLOCK_SIZE); // mmap(0, IBLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, iblock_fd, 0);
 //    assert(iblock_ptr != MAP_FAILED);
-    return iblock_ptr;
+//    cur_block->contents;
+//    return iblock_ptr;
 }
 
 void

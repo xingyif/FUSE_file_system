@@ -15,11 +15,11 @@ int ROOT_DIR_IDX = 0;
 //static void* inode_ptr =  0;
 //static int   inode_fd   = -1;
 
-inode* inodes[256];
-int inode_bitmap[256];
+//inode* inodes[256];
+//int inode_bitmap[256];
 
-inode*
-inode_init(mode_t mode, int is_file, size_t size) {
+void
+inode_init(inode* cur_inode, mode_t mode, int is_file, size_t size) {
 //    inode_fd = open(path, O_CREAT | O_RDWR, 0644);
 //    assert(inode_fd != -1);
 
@@ -27,21 +27,22 @@ inode_init(mode_t mode, int is_file, size_t size) {
 //    int rv = ftruncate(iblock_fd, NUFS_SIZE);
 //    assert(rv == 0); // success
 
-    inode* inode_ptr = malloc(sizeof(inode)); // mmap(0, sizeof(inode), PROT_READ | PROT_WRITE, MAP_SHARED, inode_fd, 0);
+//    inode* inode_ptr = malloc(sizeof(inode)); // mmap(0, sizeof(inode), PROT_READ | PROT_WRITE, MAP_SHARED, inode_fd, 0);
 //    assert(inode_ptr != MAP_FAILED);
 
-    inode_ptr->user_id = getuid();
-    inode_ptr->mode = mode;
-    inode_ptr->is_file = is_file;
-    inode_ptr->size_of = size;
-    return inode_ptr;
+    // todo, should inode contain file name
+    cur_inode->user_id = getuid();
+    cur_inode->mode = mode;
+    cur_inode->is_file = is_file;
+    cur_inode->size_of = size;
 }
 void
-inode_free(inode* inode_ptr) {
-   free(inode_ptr);
+inode_remove(inode* inode_ptr) {
+// todo
 }
 
 // find an empty spot in inodes, insert the given inode, return the index of where the inode is stored or failure
+// fixme, this func shouldn't have any input, because you have excess to all the addrs
 int
 inode_insert(inode* cur_inode, inode* inodes[], int inode_bitmap[]) {
     int next_aval_index = inode_bitmap_find_next_empty(inode_bitmap);
@@ -72,8 +73,9 @@ inode_bitmap_find_next_empty(int inode_bitmap[])
     return inode_index;
 }
 
-inode* inodes_addr() {
-    return (inode*) (get_disk() + superblock_addr()->inodes);
+inode**
+inodes_addr() {
+    return (inode**) (get_disk() + superblock_addr()->inodes);
 }
 
 int*

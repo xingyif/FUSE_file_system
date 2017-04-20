@@ -46,7 +46,7 @@ storage_init(char* disk_image)
 
 
 
-int fd;
+    int fd;
     if ((fd = open(disk_image, O_CREAT | O_RDWR, 0644)) == -1) {
         perror("Opening disk image failed!");
         exit(1);
@@ -73,7 +73,6 @@ assert(rv == 0);
 //    if (superblock_addr()->ibitmap_location == NULL) { // todo ? check a field, because sprblk_addr = disk
 	printf("superblock making time\n");
 	    superblock_init(disk);
-//    }*/
 
 
     // bitmaps initilized, fixed sized in storage.h
@@ -83,11 +82,22 @@ assert(rv == 0);
     printf("Store file system data in: %s\n", disk_image);
     printf("Disk address is at: %p\n", disk);
 
+    // setting up root_dir inode
+    superblock* sprblk_addr = superblock_addr();
+    int root_dir_idx = sprblk_addr->root_inode_idx;
+    // get inode* from inodes
+    inode* root_inode = inodes_addr()[root_dir_idx];
+    inode_init(root_inode, S_IRWXU | S_IRWXG | S_IRWXO, 0, 128);
+    // update inode* in inodes
+    inodes_addr()[root_dir_idx] = root_inode;
 
-
-    // todo! ATTENTION: shouldn't be creating root_dir here
-    // storage_init only init superblock if it doesn't exist already
-
+    // setting up root_dir block
+    void* root_directory = iblocks_addr()[root_dir_idx];
+    char* root_dir_name = "/mnt";
+    // get dir* from iblocks and initialize the root_dir
+    directory_init(root_directory, root_dir_name);
+    // update dir* in iblocks
+    iblocks_addr()[root_dir_idx] = root_directory;
 
 
 //    slist* path_list = s_split(path, '/'); // todo get home dir from array

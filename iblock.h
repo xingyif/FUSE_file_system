@@ -9,7 +9,7 @@ typedef struct iblock {
 // when the inode is a dir, the block should contains a content, which has a directory
 
 // not sure how many we need
-iblock* iblock_init();
+void iblock_init(iblock* cur_block);
 void iblock_free(iblock* iblock_ptr);
 int iblock_insert(void* cur_iblock, void* iblocks[], int iblock_bitmap[]);
 int iblock_bitmap_find_next_empty(int iblock_bitmap[]);
