@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-#include "slist.h"
+//#include "slist.h"
 
 static int
 streq(const char *aa, const char *bb) {
@@ -25,7 +25,7 @@ clamp(int x, int v0, int v1) {
     return max(v0, min(x, v1));
 }
 
-//this functionality makes no sense just look through slist not through array
+/*this functionality makes no sense just look through slist not through array
 slist*
 slist_last(slist *list) {
     while(list->next != NULL) {
@@ -33,5 +33,5 @@ slist_last(slist *list) {
 }
     return list;
 }
-
+*/
 #endif

@@ -92,5 +92,5 @@ iblock_bitmap_addr() {
 
 void*
 single_iblock_addr(int idx) {
-    return iblocks_addr() + 4096 * idx;
+    return (void*) (iblocks_addr() + 4096 * idx);
 }

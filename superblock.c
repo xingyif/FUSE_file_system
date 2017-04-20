@@ -2,6 +2,8 @@
 #include <string.h>
 
 #include "superblock.h"
+#include "inode.h"
+#include "iblock.h"
 //import blocks
 //import pages
 //import inode

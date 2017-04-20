@@ -4,11 +4,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "directory.h"
-#include "iblock.h"
-#include "inode.h"
-
-#include "superblock.h"
 
 // todo we don't need these below to be global, because we can use ..._addr()
 //extern superblock* sprblk;

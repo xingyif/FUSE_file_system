@@ -2,6 +2,11 @@
 #define IBLOCK_H
 // Created by Yifan
 
+#include <stdio.h>
+#include <stddef.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
 typedef struct iblock {
     char contents[4096]; // 4 * 1024
 } iblock;
