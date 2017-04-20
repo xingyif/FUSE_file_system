@@ -19,9 +19,9 @@ directory_init(directory* cur_dir, char* name) {
     // entries are fixed size array
 }
 
-//look for the inode_index of an entry
+// look for the entry index of a name inside a dir
 int
-directory_lookup(directory* dir, char* name) {
+directory_entry_lookup(directory* dir, char* name) {
     int num_of_entries = dir->number_of_entries;
     for (int i = 0; i < DIR_ENT_SIZE; i++) {
         dir_ent* current_entry = dir->entries[i];
