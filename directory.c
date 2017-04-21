@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <memory.h> // imported for memset in dir_del_entry
 #include "directory.h"
 #include "slist.h"
 const int FILE_NAME_LENGTH  = 27;
@@ -67,20 +68,16 @@ directory_insert_entry(directory* dir, char* name, int inode_index) {
 }
 // and inode_index of entryput an entry at an index retrun true if success
 //delete an entry in a directory
-int directory_del_entry(directory* dir, char* name) {
+int
+directory_del_entry(directory* dir, int entry_idx) {
     int num_of_entries = dir->number_of_entries;
     if (num_of_entries <= 0) {
-        perror("Nothing to delete in the current directory!");
+        printf("Nothing to delete in the current directory!");
+        return -1;
     }
-
-    for (int i = 0; i < num_of_entries; i++) {
-        dir_ent* current_entry = dir->entries[i];
-        if (current_entry->filename == name) {
-            dir->entries[i] = NULL;
-            dir->number_of_entries--;
-            free(current_entry);
-            return i;
-        }
-    }
-    return -1;
+    dir_ent* cur_entry = dir->entries[entry_idx];
+    memset(cur_entry->filename, 0, FILE_NAME_LENGTH);
+    dir->entries[entry_idx] = NULL;
+    dir->number_of_entries--;
+    return 0;
 }

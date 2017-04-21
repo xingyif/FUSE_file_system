@@ -204,12 +204,30 @@ nufs_mkdir(const char *path, mode_t mode) {
     return -1;
 }
 
-// remove a file
+// remove a file. Returns success, ENOENT, or EISDIR
 int
 nufs_unlink(const char *path) {
     printf("unlink(%s)\n", path);
+    // checks if the path exists
+    int index = get_entry_index(path);
+    if (index < 0) {
+        return -ENOENT; // path doesn't exist
+    }
 
-    return -1;
+    inode* cur_inode = inodes_addr()[index]; // todo change to single_addr.. ?
+    // given path is a dir not a file
+    if (!cur_inode->is_file) {
+        return -EISDIR;
+    }
+
+    // delete the entry from its home dir
+    int rv = remove_dir_entry(path);
+
+    // set cur_inode & cur_iblock to be null
+    iblocks_addr()[index] = NULL;
+    inodes_addr()[index] = NULL;
+
+    return rv; // success or failure
 }
 
 int

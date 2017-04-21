@@ -22,7 +22,7 @@ int directory_entry_lookup(directory* dir, char* name); //look for the inode_ind
 // maybe have a tree look up for slist?
 int directory_insert_entry(directory* dir, char* name, int inode_index); //given a directory, name of entry,
 // and inode_index of entryput an entry at an index retrun true if success
-int directory_del_entry(directory* dir, char* name); //delete an entry in a directory
+int directory_del_entry(directory* dir, int entry_idx); //delete an entry in a directory
 //slist* directory_list(const char* path);// for the tree: puts a path into slist format
 //void print_directory(directory dd);
 

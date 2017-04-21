@@ -249,6 +249,41 @@ add_dir_entry(char *path, int new_inode_idx) {
     return -ENOENT;
 }
 
+
+int
+remove_dir_entry(char *path) {
+    slist *path_list = s_split(path, '/');
+    directory *root_dir = (directory *) (iblocks_addr()[superblock_addr()->root_inode_idx]);
+
+    // if in root dir, move path_list to the next
+    if (streq(path_list->data, root_dir->dir_name)) {
+        path_list = path_list->next;
+    }
+
+    directory *current = root_dir;
+    while (path_list != NULL) {
+        // get the index of the entry
+        int entry_idx = directory_entry_lookup(current, path_list->data);
+        // didn't find current entry
+        // return path not found error
+        if (entry_idx < 0) {
+            return -ENOENT;
+        }
+        // found it, and the path_list is the last in the list, delete it
+        if (path_list->next == NULL) {
+            int rv = directory_del_entry(current, entry_idx);
+            return rv; // either failure or success
+        } else {
+            // haven't finished yet, keep traversing
+            dir_ent *cur_ent = current->entries[entry_idx];
+            int entry_inode_index = cur_ent->entry_inode_index;
+            current = iblocks_addr()[entry_inode_index];  // todo should i switch this to single_iblock...
+            path_list = path_list->next;
+        }
+    }
+    return -ENOENT;
+}
+
 int
 get_stat(char *path, struct stat *st) {
    // printf("in get_stat\n");
