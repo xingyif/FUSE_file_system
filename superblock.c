@@ -15,35 +15,35 @@ superblock_init(void* disk_img)
     // offset for the superblock
     size_t offset = 0;
 
-printf("making the superblock 1\n");
+//printf("making the superblock 1\n");
     // todo not sure if i need this
-printf("size of superblock, disk_img: %d, %d\n",sizeof( sprblk), sizeof(disk_img));
+//printf("size of superblock, disk_img: %d, %d\n",sizeof( sprblk), sizeof(disk_img));
    sprblk = disk_img;
 
-printf("making the superblock 2\n");
+//printf("making the superblock 2\n");
     // offset for inode_bitmap
     offset += sizeof(superblock);
-printf("making the superblock 2a: %d, %p\n", offset, sprblk);
+//printf("making the superblock 2a: %d, %p\n", offset, sprblk);
     sprblk->ibitmap_location = (size_t*)offset;
 
-printf("making the superblock 3\n"); fflush(stdout); fflush(stderr);
+//printf("making the superblock 3\n"); fflush(stdout); fflush(stderr);
     // offset for iblock_bitmap
     offset += 256 * sizeof(char); // use char => 1byte, int => 8bytes, saves space in "disk"
     sprblk->bbitmap_location = offset;
 
-printf("making the superblock 4\n");
+//printf("making the superblock 4\n");
     // offset for inodes
     offset += 256 * sizeof(char); // use char => 1byte, int => 8bytes, saves space in "disk"
     sprblk->inodes = offset;
 
-printf("making the superblock 5\n");
+//printf("making the superblock 5\n");
     // offset for iblocks
     offset += 256 * sizeof(inode);
     sprblk->iblocks = offset;
 
-printf("making the superblock 6\n");
+//printf("making the superblock 6\n");
 	sprblk->root_inode_idx = 0;
-printf("finished making superblock");
+//printf("finished making superblock");
 }
 
 void

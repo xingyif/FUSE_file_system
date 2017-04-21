@@ -39,7 +39,7 @@ inode_init(inode* cur_inode, mode_t mode, int is_file, size_t size) {
     cur_inode->mode = mode;
     cur_inode->is_file = is_file;
     cur_inode->size_of = size;
-printf("cur inode: %p\n", cur_inode);
+//printf("cur inode: %p\n", cur_inode);
 }
 void
 inode_remove(inode* inode_ptr) {
@@ -80,8 +80,8 @@ inode_bitmap_find_next_empty(int* inode_bitmap_ptr)
 
 inode**
 inodes_addr() {
-printf("superblock address is at: %p\n", superblock_addr());
-printf("Disk address pinter is at: %p\n", get_disk());
+//printf("superblock address is at: %p\n", superblock_addr());
+//printf("Disk address pinter is at: %p\n", get_disk());
     return (inode**) (get_disk() + superblock_addr()->inodes);
 }
 
@@ -92,6 +92,6 @@ inode_bitmap_addr() {
 
 void*
 single_inode_addr(int idx) {
-   printf("inode address is at: %p\n", inodes_addr());
+//   printf("inode address is at: %p\n", inodes_addr());
     return (void*) (inodes_addr() + sizeof(inode) * idx);
 }

@@ -56,7 +56,7 @@ nufs_access(const char *path, int mask)
 int
 nufs_getattr(const char *path, struct stat *st)
 {
-    printf("In getattr(%s)\n", path); // debugging purpose
+//    printf("In getattr(%s)\n", path); // debugging purpose
     // get_stat will check if file/dir exist
     int rv = get_stat(path, st);
     if (rv == -1) {
@@ -75,17 +75,36 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
              off_t offset, struct fuse_file_info *fi)
 {
     struct stat st;
+int index = get_entry_index(path);
+    if (index < 0) {
+        return -ENOENT; // path doesn't exist
+    }
+inode* cur_inode = single_inode_addr(index);
+directory* cur_dir = single_iblock_addr(index);
 
+for(int i = 0; i < 32; i++) {
+dir_ent* cur_ent = cur_dir->entries[i];
+offset += (i* sizeof(dir_ent));            
+ if (cur_ent == NULL) {
+continue;
+       }
+else if (filler(buf, cur_ent->filename, &st, offset) !=0) {
+
+return 0;
+}
+}
     printf("readdir(%s)\n", path);
 
-    get_stat("/", &st);
+
+
+ //   get_stat("/", &st);
     // filler is a callback that adds one item to the result
     // it will return non-zero when the buffer is full
-    filler(buf, ".", &st, 0);
+   // filler(buf, ".", &st, 0);
 
-    get_stat("/hello.txt", &st);
-    filler(buf, "hello.txt", &st, 0);
-
+//   get_stat("/hello.txt", &st);
+  // filler(buf, "hello.txt", &st, 0);
+    printf("made a hello.txt file\n");
     return 0;
 }
 
@@ -94,7 +113,8 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 int
 nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 {
-    printf("in nufs_mknod:(%s, %04o)\n", path, mode);
+mode = 010064;    
+printf("in nufs_mknod:(%s, %04o)\n", path, mode);
     // checks if the path exists
     int index = get_entry_index(path);
     if (index >= 0) {
@@ -138,10 +158,12 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 int
 nufs_mkdir(const char *path, mode_t mode)
 {
+printf("in nufs_mkdir:(%s, %04o)\n", path, mode);
+
     // checks if the path exists
     int index = get_entry_index(path);
     if (index >= 0) {
-        return -EEXIST; // path already exists
+   //     return -EEXIST; // path already exists
     }
 
     int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
@@ -298,7 +320,17 @@ nufs_write(const char *path, const char *buf, size_t size, off_t offset, struct 
 {
     // todo inode_init
     printf("write(%s, %ld bytes, @%ld)\n", path, size, offset);
-    return -1;
+    int index = get_entry_index(path);
+inode* cur_inode = single_inode_addr(index);
+if (offset + size > cur_inode->size_of) {
+cur_inode-> size_of = offset + size;
+return cur_inode->size_of;
+}
+char *new_blk;
+for(int position = offset; position < offset+size;) {
+memmove(new_blk + position % 4096, buf, offset+size - position);
+}
+	 return size;
 }
 
 void
