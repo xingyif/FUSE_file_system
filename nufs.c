@@ -333,7 +333,7 @@ nufs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_fi
 
     // checks if the path exists
     int index = get_entry_index(path);
-    if (index < 0) {
+    if (index < 0) {//what if we are creating a new text??
         return -1; // ENOENT: path doesn't exist
     }
 
@@ -352,7 +352,7 @@ nufs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_fi
 
     char *new_blk;
     for (int position = offset; position < offset + size;) {
-        memmove(new_blk + position % 4096, buf, offset + size - position);
+        memmove(buf, new_blk + position % 4096, 4096 - position % 4096);
     }
     return size;
 }
@@ -361,16 +361,16 @@ nufs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_fi
 int
 nufs_write(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
     printf("write(%s, %ld bytes, @%ld)\n", path, size, offset);
-
+// get iblock index for this path
     int index = get_entry_index(path);
-    inode *cur_inode = single_inode_addr(index);
-    if (offset + size > cur_inode->size_of) {
-        cur_inode->size_of = offset + size;
-        return cur_inode->size_of;
+// get block with the index
+    iblock *cur_block = single_iblock_addr(index);
+    if (offset + size > 4096) {
+        return -ENOENT;
     }
     char *new_blk;
     for (int position = offset; position < offset + size;) {
-        memmove(new_blk + position % 4096, buf, offset + size - position);
+        memmove(new_blk + position % 4096, buf, 4096 - position % 4096);
     }
     return size;
 }
