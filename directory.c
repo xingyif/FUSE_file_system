@@ -34,7 +34,7 @@ directory_entry_lookup(directory* dir, char* name) {
             return i;//cur_dir->entries[directory_lookup(cur_dir, "blah")]->entry_node_index;
         }
     }
-    return -1; // didn't find one
+    return -ENOENT; // didn't find one
 }
 
 //given a directory, name of entry,
@@ -64,7 +64,7 @@ directory_insert_entry(directory* dir, char* name, int inode_index) {
             return i;
         }
     }
-    return -1; // error: didn't successfully insert
+    return -ENOSPC; // error: didn't successfully insert
 }
 // and inode_index of entryput an entry at an index retrun true if success
 //delete an entry in a directory
@@ -73,7 +73,7 @@ directory_del_entry(directory* dir, int entry_idx) {
     int num_of_entries = dir->number_of_entries;
     if (num_of_entries <= 0) {
         printf("Nothing to delete in the current directory!");
-        return -1;
+        return -ENOENT;
     }
     dir_ent* cur_entry = dir->entries[entry_idx];
     memset(cur_entry->filename, 0, FILE_NAME_LENGTH);

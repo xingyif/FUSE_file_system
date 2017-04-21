@@ -113,7 +113,7 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 // called for: man 2 open, man 2 link
 int
 nufs_mknod(const char *path, mode_t mode, dev_t rdev) {
-    mode = 010064;
+//    mode = 010064;   todo shouldn't be forcing this to be a file mode, trust fuse
     printf("in nufs_mknod:(%s, %04o)\n", path, mode);
     // checks if the path exists
     int index = get_entry_index(path);
@@ -220,7 +220,10 @@ nufs_unlink(const char *path) {
     // delete the entry from its home dir
     int rv = remove_dir_entry(path);
 
-    // set cur_inode & cur_iblock to be null
+    // set the bitmaps to be avaliable
+    inode_bitmap_addr()[index] = 0;
+    iblock_bitmap_addr()[index] = 0;
+    // todo don't need set cur_inode & cur_iblock to be null
     iblocks_addr()[index] = NULL;
     inodes_addr()[index] = NULL;
 
@@ -233,17 +236,18 @@ nufs_rmdir(const char *path) {
     // checks if the path exists
     int index = get_entry_index(path);
     if (index < 0) {
-        return -1; // ENOENT: path doesn't exist
+        return index; // ENOENT: path doesn't exist
     }
 
-    // remove inode, and remove iblock_ptrs at the given index
-    inodes_addr()[index] = NULL;
-    iblocks_addr()[index] = NULL;
+    int rv = remove_dir_entry(path);
     // update the bitmaps
     inode_bitmap_addr()[index] = 0;
     iblock_bitmap_addr()[index] = 0;
+    // todo not needed remove inode, and remove iblock_ptrs at the given index
+    inodes_addr()[index] = NULL;
+    iblocks_addr()[index] = NULL;
 
-    return 0; // success
+    return rv; // success or failure
 }
 
 // implements: man 2 rename
