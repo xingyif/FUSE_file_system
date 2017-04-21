@@ -58,15 +58,14 @@ nufs_access(const char *path, int mask)
 int
 nufs_getattr(const char *path, struct stat *st)
 {
-    printf("In getattr(%s)\n", path); // debugging purpose
+    printf("In nufs_getattr(%s)\n", path); // debugging purpose
     // get_stat will check if file/dir exist
     int rv = get_stat(path, st);
     if (rv == -1) {
+        printf("in nufs_getattr, given path doesn't exist\n");
         return -ENOENT; // path doesn't exist
     }
-    else {
-        return 0;
-    }
+    return rv;
 }
 
 // implementation for: man 2 readdir

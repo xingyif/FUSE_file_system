@@ -41,7 +41,7 @@ void *disk;
 void
 storage_init(char *disk_image) {
 
-    printf("home path: %s\n", disk_image);
+    printf("in storage_init, disk_image: %s\n", disk_image);
     // pages_init(disk_image);
 
 
@@ -52,8 +52,6 @@ storage_init(char *disk_image) {
         perror("Opening disk image failed!");
         exit(1);
     }
-    perror("? ");
-    printf("file descriptor maid\n");
 
     int rv = ftruncate(fd, DISK_SIZE);
     assert(rv == 0);
@@ -66,13 +64,12 @@ storage_init(char *disk_image) {
         perror("Couldn't map image");
         exit(1);
     }
-    printf("mmaped\n");
+    printf("in storage_init, mmaped the disk\n");
 //sprblk = (superblock *) disk;
 
 // Had to comment out to try and avoid this error
 
 //    if (superblock_addr()->ibitmap_location == NULL) { // todo ? check a field, because sprblk_addr = disk
-    printf("superblock making time\n");
     superblock_init(disk);
 
 
@@ -80,8 +77,8 @@ storage_init(char *disk_image) {
     // inodes initilized, fixed sized in storage.h
     // iblocks initilized, fixed sized in storage.h
     // create the root dir and put it to inodes and iblocks
-    printf("Store file system data in: %s\n", disk_image);
-    printf("Disk address is at: %p\n", disk);
+    printf("in storage_init, disk_image: %s\n", disk_image);
+    printf("in storage_init, disk_ptr: %p\n", disk);
 
     // setting up inode_bitmap and iblock_bitmap
     for (int i = 0; i < 256; i++) {
@@ -95,18 +92,14 @@ storage_init(char *disk_image) {
     // get inode* from inodes
     inode *root_inode = single_inode_addr(root_dir_idx);
 
-    printf("root inode is: %p\n", root_inode);
+    printf("in storage_init, root inode ptr: %p\n", root_inode);
 //    inodes_addr()[root_dir_idx] = root_inode;
     inode_init(root_inode, 040755, 0, 4096); // S_IRWXU | S_IRWXG | S_IRWXO
     inodes_addr()[root_dir_idx] = root_inode;
 
-    printf("root inode pointer 2 is: %p\n", single_inode_addr(0));
-
-
     // update inode* in inodes
     inode_bitmap_addr()[root_dir_idx] = 1;
 
-    printf("root inode pointer 1 is: %p\n", inodes_addr()[root_dir_idx]);
 
     //creating iblock root_dir here
     directory *root_iblock = single_iblock_addr(root_dir_idx);
@@ -117,7 +110,6 @@ storage_init(char *disk_image) {
     directory_init(root_iblock, root_dir_name);
     iblocks_addr()[root_dir_idx] = root_iblock;
     iblock_bitmap_addr()[root_dir_idx] = 1;
-    printf("root inode pointer is: %p\n", inodes_addr()[root_dir_idx]);
 
     // setting up root_dir block
     // update dir* in iblocks
@@ -156,11 +148,11 @@ get_entry_index(char *path) {
     // 2. get inodes
     // 3. get iblocks
     if (*path == '/') {
-        printf("home dir\n");
+        printf("in get_entry_index, given path is home dir\n");
         return 0;
     }
     slist *path_list = s_split(path, '/');//  get given dir/file from array
-    printf("home path: %s\n", path_list->data);
+    printf("in get_entry_index, home path: %s\n", path_list->data);
 
     //  char* path_array = slist_close(path_list); don't need to use  slist_close returns a pointer to the array
     //todo check if user path starts at home else look at cur_dir path from home
