@@ -34,14 +34,16 @@ nufs_access(const char *path, int mask)
     // get current user id
     int cur_uid = getuid();
     inode* cur_inode = single_inode_addr(index);
+    // todo not checking permission for getting rid of the error
     /* current user is not the owner
     if (cur_inode->user_id != cur_uid) {
         return -EACCES;
-    } // need to fix how these are being set for step 2 and supporting metadeta
+    } // todo need to fix how these are being set for step 2 and supporting metadeta
     // when cur_user == file owner
     if (cur_inode->mode != mask) {
         return -EACCES;
     }*/
+
     // Read, write, execute/search by owner
 
     // check u_id? return -EACCESS if the requested permission isn't available
@@ -56,15 +58,15 @@ nufs_access(const char *path, int mask)
 int
 nufs_getattr(const char *path, struct stat *st)
 {
-//    printf("In getattr(%s)\n", path); // debugging purpose
+
+    printf("In nufs_getattr(%s)\n", path); // debugging purpose
     // get_stat will check if file/dir exist
     int rv = get_stat(path, st);
     if (rv == -1) {
+        printf("in nufs_getattr, given path doesn't exist\n");
         return -ENOENT; // path doesn't exist
     }
-    else {
-        return 0;
-    }
+    return rv;
 }
 
 // implementation for: man 2 readdir
@@ -130,14 +132,17 @@ printf("in nufs_mknod:(%s, %04o)\n", path, mode);
     // create the new inode ptr
     inode* cur_inode = single_inode_addr(aval_idx);
     // flush the inode ptr to disk
-    inodes_addr()[aval_idx] = cur_inode;
+//    inodes_addr()[aval_idx] = cur_inode;
     inode_init(cur_inode, mode, 1, 0);
+    inodes_addr()[aval_idx] = cur_inode;
+    // put the initialized inode to inodes
     // update inode_bitmap
     inode_bitmap_addr()[aval_idx] = 1;
 
     // create the new iblock ptr
     iblock* cur_iblock = single_iblock_addr(aval_idx);
     // flush the iblock ptr to disk
+//    iblocks_addr()[aval_idx] = cur_iblock;
     iblocks_addr()[aval_idx] = cur_iblock;
     // update the iblock_bitmap
     iblock_bitmap_addr()[aval_idx] = 1;
@@ -173,8 +178,9 @@ printf("in nufs_mkdir:(%s, %04o)\n", path, mode);
     // create the new inode ptr
     inode* cur_inode = single_inode_addr(aval_idx);
     // flush the inode ptr to disk
-    inodes_addr()[aval_idx] = cur_inode;
+//    inodes_addr()[aval_idx] = cur_inode;
     inode_init(cur_inode, mode, 1, 0);
+    inodes_addr()[aval_idx] = cur_inode;
     // update inode_bitmap
     inode_bitmap_addr()[aval_idx] = 1;
 
@@ -199,10 +205,12 @@ printf("in nufs_mkdir:(%s, %04o)\n", path, mode);
     return -1;
 }
 
+// remove a file
 int
 nufs_unlink(const char *path)
 {
     printf("unlink(%s)\n", path);
+
     return -1;
 }
 

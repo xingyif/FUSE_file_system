@@ -15,6 +15,7 @@ superblock_init(void* disk_img)
     // offset for the superblock
     size_t offset = 0;
 
+/* todo merge conflict
 //printf("making the superblock 1\n");
     // todo not sure if i need this
 //printf("size of superblock, disk_img: %d, %d\n",sizeof( sprblk), sizeof(disk_img));
@@ -27,6 +28,16 @@ superblock_init(void* disk_img)
     sprblk->ibitmap_location = (size_t*)offset;
 
 //printf("making the superblock 3\n"); fflush(stdout); fflush(stderr);
+*/
+    // todo not sure if i need this
+    printf("in superblock_init: size of superblock: %d, sizeof(disk_img): %d\n",sizeof( sprblk), sizeof(disk_img));
+   sprblk = disk_img;
+
+    // offset for inode_bitmap
+    offset += sizeof(superblock);
+    printf("in superblock_init, offset for inode_bitmap: %d, sprblk: %p\n", offset, sprblk);
+    sprblk->ibitmap_location = (size_t*)offset;
+
     // offset for iblock_bitmap
     offset += 256 * sizeof(char); // use char => 1byte, int => 8bytes, saves space in "disk"
     sprblk->bbitmap_location = offset;
@@ -44,6 +55,8 @@ superblock_init(void* disk_img)
 //printf("making the superblock 6\n");
 	sprblk->root_inode_idx = 0;
 //printf("finished making superblock");
+	sprblk->root_inode_idx = 0;
+    printf("finished making superblock");
 }
 
 void
