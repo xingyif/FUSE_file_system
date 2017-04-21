@@ -34,14 +34,16 @@ nufs_access(const char *path, int mask)
     // get current user id
     int cur_uid = getuid();
     inode* cur_inode = single_inode_addr(index);
+    // todo not checking permission for getting rid of the error
     /* current user is not the owner
     if (cur_inode->user_id != cur_uid) {
         return -EACCES;
-    } // need to fix how these are being set for step 2 and supporting metadeta
+    } // todo need to fix how these are being set for step 2 and supporting metadeta
     // when cur_user == file owner
     if (cur_inode->mode != mask) {
         return -EACCES;
     }*/
+
     // Read, write, execute/search by owner
 
     // check u_id? return -EACCESS if the requested permission isn't available
