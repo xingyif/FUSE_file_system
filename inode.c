@@ -67,7 +67,7 @@ inode_remove(inode* inode_ptr) {
 int
 inode_bitmap_find_next_empty(int* inode_bitmap_ptr)
 {
-    int inode_index = -ENOMEM; // operation failed due to lack of memory or disk space
+    int inode_index = -ENOSPC; // operation failed due to lack of disk space
     for (int ii = 1; ii < 256; ii++) {
         if (inode_bitmap_ptr[ii] == 0) { // if iblock is empty
             inode_index = ii;

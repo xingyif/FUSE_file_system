@@ -101,12 +101,10 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev)
         return -EEXIST; // path already exist
     }
 
-    // add the new entry to the current dir
-//    add_dir_entry()
-
     int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
     if (aval_idx < 0) {
-        return -1; // ENOMEM: operation failed due to lack of memory or disk space
+        // ENOSPC: operation failed due to lack of disk space
+        return aval_idx;
     }
 
     // create the new inode ptr
@@ -124,8 +122,15 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev)
     // update the iblock_bitmap
     iblock_bitmap_addr()[aval_idx] = 1;
 
+    // create an entry and add the new entry to its own home dir
+    int new_entry_idx = add_dir_entry(path, aval_idx);
+    if (new_entry_idx < 0) {
+        // ERROR out
+        return new_entry_idx;
+    }
+
     printf("after mknod(%s, %04o)\n", path, mode);
-    return 0;
+    return 0; // success
 }
 
 // most of the following callbacks implement
@@ -141,13 +146,8 @@ nufs_mkdir(const char *path, mode_t mode)
 
     int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
     if (aval_idx < 0) {
-        return -1; // ENOMEM: operation failed due to lack of memory or disk space
+        return aval_idx; // ENOSPC: operation failed due to lack of memory or disk space
     }
-
-    // todo add_entry(dir* cur_dir, name, inode_index)
-    // check iblock, if entry does not exist, then create it and put it to the given dir
-    //
-
     // create the new inode ptr
     inode* cur_inode = single_inode_addr(aval_idx);
     // flush the inode ptr to disk
@@ -159,11 +159,19 @@ nufs_mkdir(const char *path, mode_t mode)
     // create the new iblock ptr
     directory* cur_dir = single_iblock_addr(aval_idx);
 
+    // create the new directory ptr
     directory_init(cur_dir, slist_last(path)->data);
-    // todo why comment out????? flush the dir ptr to disk
-//    iblocks_addr()[aval_idx] = cur_dir;
+    // flush the dir ptr to disk
+    iblocks_addr()[aval_idx] = cur_dir;
     // update the iblock_bitmap
-  //  iblock_bitmap_addr()[aval_idx] = 1;
+    iblock_bitmap_addr()[aval_idx] = 1;
+
+    // check iblock, if entry does not exist, then create it and put it to the given dir
+    int new_entry_idx = add_dir_entry(path, aval_idx);
+    if (new_entry_idx < 0) {
+        // ERROR out
+        return new_entry_idx;
+    }
 
     printf("after mkdir(%s)\n", path);
     return -1;

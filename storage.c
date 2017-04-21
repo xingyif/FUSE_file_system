@@ -171,7 +171,7 @@ get_entry_index(char *path) {
         path_list = path_list->next;
     }
     /*
-    else {//todo ask prof tuck if this oki
+    else {
 	printf("current directory: %s\n", cur_dir->dir_name);
 	printf("path list: %s\n", path_list->data);
         perror("user must give path that starts from home\n");
@@ -196,51 +196,44 @@ get_entry_index(char *path) {
             current = iblocks_addr()[entry_inode_index];
             path_list = path_list->next;
         }
-
     }
-
     return -ENOENT;
 }
 
-//int
-//add_dir_entry(char* path, char* new_name, int new_inode_idx) {
-//    slist *path_list = s_split(path, '/');
-//    directory *cur_dir = (directory *) (iblocks_addr()[superblock_addr()->root_inode_idx]);
-//
-//    //is the user's path starting from this directory or an entry in it
-//    if (streq(path_list->data, cur_dir->dir_name)) {
-//        path_list = path_list->next;
-//    }
-//
-//    while (path_list != NULL) {
-//        // get the index of the entry
-//        int entry_idx = directory_entry_lookup(cur_dir, path_list->data);
-//        // didn't find the entry
-//        if (entry_idx < 0) {
-//            // put the new entry to cur_dir
-//            // todo not sure if ?????????????????????????????????????????? this works ??????????????????????????????????????????
-//            dir_ent* new_entry = cur_dir;
-//            new_entry->filename = new_name;
-//            new_entry->entry_inode_index = new_inode_idx;
-//            cur_dir->number_of_entries++;
-//            return 0; // success
-//        }
-//        if (entry_inode_index == -1) {
-//            // no such file or dir
-//            return -ENOENT;
-//        } else {
-//            dir_ent *cur_entry = cur_dir->entries[entry_inode_index];
-//            if (streq(cur_entry->filename, path_list->data)) {
-//                return cur_entry->entry_inode_index;
-//            } else {
-//                cur_dir = (directory *) iblocks_addr()[entry_inode_index];
-//                path_list = path_list->next;
-//            }
-//        }
-//    }
-//
-//
-//}
+int
+add_dir_entry(char *path, int new_inode_idx) {
+    slist *path_list = s_split(path, '/');
+    directory *root_dir = (directory *) (iblocks_addr()[superblock_addr()->root_inode_idx]);
+
+    // if in root dir, move path_list to the next
+    if (streq(path_list->data, root_dir->dir_name)) {
+        path_list = path_list->next;
+    }
+
+    directory *current = root_dir;
+    while (path_list != NULL) {
+        // get the index of the entry
+        int entry_idx = directory_entry_lookup(current, path_list->data);
+        // didn't find the entry, and the path_list is the last in the list
+        // make a new entry and put it in cur_dir
+        if ((entry_idx < 0) && (path_list->next == NULL)) {
+            // put the entry array in
+            int new_entry_idx = directory_insert_entry(current, path_list->data, new_inode_idx);
+            return new_entry_idx; // success or didn't successfully insert
+        } else {
+            // if didn't find it, and the next is not null, throw path doesn't exist exception
+            if (entry_idx < 0) {
+                return -ENOENT;
+            }
+            // haven't finished yet, keep traversing
+            dir_ent *cur_ent = current->entries[entry_idx];
+            int entry_inode_index = cur_ent->entry_inode_index;
+            current = iblocks_addr()[entry_inode_index];
+            path_list = path_list->next;
+        }
+    }
+    return -ENOENT;
+}
 
 int
 get_stat(char *path, struct stat *st) {

@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 #include "directory.h"
 #include "slist.h"
 const int FILE_NAME_LENGTH  = 27;
@@ -40,25 +41,29 @@ int
 directory_insert_entry(directory* dir, char* name, int inode_index) {
     int num_of_entries = dir->number_of_entries;
     if (num_of_entries >= DIR_ENT_SIZE) {
-        perror("No room to store more in the current directory!");
+        printf("No room to store more in the current directory!");
+        return -ENOSPC;
     }
     // todo check if the size of the char array is > 27
     if (sizeof(*name) > FILE_NAME_LENGTH) {
-        perror("Name of file/dir is too long!");
+        printf("Name of file/dir is too long!");
+        return -ENOSPC;
     }
-    dir_ent* new_entry = malloc(sizeof(dir_ent));
+    // initialize the entry ptr
+    dir_ent *new_entry = (dir_ent*) dir;// todo not sure if ?????????????????????????????????????????? this works
     new_entry->filename = name;
     new_entry->entry_inode_index = inode_index;
-
+    // find an empty spot in entries[], and insert it
     for (int i = 0; i < num_of_entries; i++) {
         dir_ent* current_entry = dir->entries[i];
+        // insert new entry
         if (current_entry == NULL) {
             dir->entries[i] = new_entry;
             dir->number_of_entries++;
             return i;
         }
     }
-    return -1; // error: something went wrong
+    return -1; // error: didn't successfully insert
 }
 // and inode_index of entryput an entry at an index retrun true if success
 //delete an entry in a directory
