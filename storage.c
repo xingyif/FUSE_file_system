@@ -270,16 +270,23 @@ get_stat(char *path, struct stat *st) {
     return 0;
 }
 
-const char *
-get_data(char *path) // todo do we always assume the path is a file????????????
+void*
+get_data(char *path) // todo do we always assume the path is a file???????????? no
 {
     // assuming that the given path is to a file not a directory
     int index = get_entry_index(path);
     if (index < 0) {
         return -ENOENT;
     }
-    iblock *cur_iblock = iblocks_addr()[index];
-    return cur_iblock->contents;
+    inode* cur_inode = inodes_addr()[index];
+    // if we are looking at a file
+    if (cur_inode->is_file) {
+        iblock *cur_iblock = iblocks_addr()[index];
+        return cur_iblock->contents;
+    }
+    // if we are looking at a directory
+    directory* cur_dir = iblocks_addr()[index];
+    return cur_dir;
 }
 
 //const char*
