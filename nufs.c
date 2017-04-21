@@ -63,10 +63,7 @@ nufs_getattr(const char *path, struct stat *st) {
     printf("In nufs_getattr(%s)\n", path); // debugging purpose
     // get_stat will check if file/dir exist
     int rv = get_stat(path, st);
-    if (rv == -1) {
-        printf("in nufs_getattr, given path doesn't exist\n");
-        return -ENOENT; // path doesn't exist
-    }
+    printf("get_attr(%s) -> (%d) {mode: %04o}\n", path, rv, st->st_mode);
     return rv;
 }
 
@@ -167,7 +164,7 @@ nufs_mkdir(const char *path, mode_t mode) {
     // checks if the path exists
     int index = get_entry_index(path);
     if (index >= 0) {
-        //     return -EEXIST; // path already exists
+     //   return -EEXIST; // path already exists
     }
 
     int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());

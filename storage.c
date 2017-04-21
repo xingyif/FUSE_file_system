@@ -290,9 +290,8 @@ get_stat(char *path, struct stat *st) {
     int index = get_entry_index(path);
     if (index < 0) {
         // didn't find the given path
-        //todo perror&exit or return errorCode????????????????
         printf("in get_stat, about to return ENOENT, because given path doesn't exist\n");
-        return -ENOENT; // TODO included <errno.h>
+        return -ENOENT;
     }
     // write sizeof(stat) bytes of 0 to st
     memset(st, 0, sizeof(struct stat));
