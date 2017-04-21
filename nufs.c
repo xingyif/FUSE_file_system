@@ -112,14 +112,17 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev)
     // create the new inode ptr
     inode* cur_inode = single_inode_addr(aval_idx);
     // flush the inode ptr to disk
-    inodes_addr()[aval_idx] = cur_inode;
+//    inodes_addr()[aval_idx] = cur_inode;
     inode_init(cur_inode, mode, 1, 0);
+    inodes_addr()[aval_idx] = cur_inode;
+    // put the initialized inode to inodes
     // update inode_bitmap
     inode_bitmap_addr()[aval_idx] = 1;
 
     // create the new iblock ptr
     iblock* cur_iblock = single_iblock_addr(aval_idx);
     // flush the iblock ptr to disk
+//    iblocks_addr()[aval_idx] = cur_iblock;
     iblocks_addr()[aval_idx] = cur_iblock;
     // update the iblock_bitmap
     iblock_bitmap_addr()[aval_idx] = 1;
@@ -153,8 +156,9 @@ nufs_mkdir(const char *path, mode_t mode)
     // create the new inode ptr
     inode* cur_inode = single_inode_addr(aval_idx);
     // flush the inode ptr to disk
-    inodes_addr()[aval_idx] = cur_inode;
+//    inodes_addr()[aval_idx] = cur_inode;
     inode_init(cur_inode, mode, 1, 0);
+    inodes_addr()[aval_idx] = cur_inode;
     // update inode_bitmap
     inode_bitmap_addr()[aval_idx] = 1;
 
@@ -179,10 +183,12 @@ nufs_mkdir(const char *path, mode_t mode)
     return -1;
 }
 
+// remove a file
 int
 nufs_unlink(const char *path)
 {
     printf("unlink(%s)\n", path);
+
     return -1;
 }
 

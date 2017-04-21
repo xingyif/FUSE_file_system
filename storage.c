@@ -96,8 +96,9 @@ storage_init(char *disk_image) {
     inode *root_inode = single_inode_addr(root_dir_idx);
 
     printf("root inode is: %p\n", root_inode);
-    inodes_addr()[root_dir_idx] = root_inode;
+//    inodes_addr()[root_dir_idx] = root_inode;
     inode_init(root_inode, 040755, 0, 4096); // S_IRWXU | S_IRWXG | S_IRWXO
+    inodes_addr()[root_dir_idx] = root_inode;
 
     printf("root inode pointer 2 is: %p\n", single_inode_addr(0));
 
@@ -109,11 +110,12 @@ storage_init(char *disk_image) {
 
     //creating iblock root_dir here
     directory *root_iblock = single_iblock_addr(root_dir_idx);
-    iblocks_addr()[root_dir_idx] = root_iblock;
+//    iblocks_addr()[root_dir_idx] = root_iblock;
 
     char *root_dir_name = '/'; //todo is it mnt or '/'
     // get dir* from iblocks and initialize the root_dir
     directory_init(root_iblock, root_dir_name);
+    iblocks_addr()[root_dir_idx] = root_iblock;
     iblock_bitmap_addr()[root_dir_idx] = 1;
     printf("root inode pointer is: %p\n", inodes_addr()[root_dir_idx]);
 
