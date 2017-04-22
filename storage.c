@@ -146,7 +146,7 @@ printf("in get_entry_index, given path is: %s\n", path);
     // fixme addr() returns ** because can't case void to directory
     //todo assuming that user is giving path that either starts with home dir or entry in home dir
     // get to the name we are looking for
-    if (streq(path_list->data, root_dir->dir_name)) {
+    if (streq(path_list->data, "")) {
         path_list = path_list->next;
     }
 /*if ((path_list->next == NULL) && (path_list->data[0] == "/")) {
@@ -194,7 +194,7 @@ printf("in add dir_entry path :%s, index: %d\n", path, new_inode_idx);
 
 printf("in add dir_entry path 1 :%s, index: %d\n", (path_list->next), new_inode_idx);
     // if in root dir, move path_list to the next
-    if (streq(path_list->data, root_dir->dir_name)) {
+    if (streq(path_list->data, "")) {
         path_list = path_list->next;
     }
 
