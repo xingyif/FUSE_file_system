@@ -331,13 +331,14 @@ nufs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_fi
     }
 
     // data can be file contents or directory contents
-    void *data = get_data(path);
+//    void *data = get_data(path);
 
-    inode *cur_inode = single_inode_addr(index);
-    if (offset > cur_inode->size_of) {
-        return 0;
+    iblock *cur_iblock = single_iblock_addr(index);
+    if (offset + size > 4096) {
+        return -ENOENT;
     }
-pread(fi->fh, buf, size,offset);
+ size = size - offset;
+//pread(fi->fh, buf, size,offset);
     /*
     int len = strlen(data) + 1;
     if (size < len) {
@@ -348,7 +349,12 @@ pread(fi->fh, buf, size,offset);
     for (int position = offset; position < offset + size;) {
         memmove(buf, new_blk + position % 4096, 4096 - position % 4096);
     } */
-    return 0;
+
+memcpy(buf, cur_iblock + offset, size);
+
+printf("in read after memcpy buf: %s\n", buf);
+
+    return strlen(cur_iblock)-offset;
 }
 
 // Actually write data
@@ -371,7 +377,9 @@ return -EISDIR;
 for (int position = offset; position < offset + size;) {  
         memmove(new_blk + position % 4096, buf, 4096 - position % 4096);
     }*/
-	memove(cur_block+offset,buf,size);
+	memcpy(cur_block + offset, buf, size);
+printf("in write afte memcpy at cur_block: %s\n", cur_block);
+
     return size;
 }
 
