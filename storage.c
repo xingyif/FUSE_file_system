@@ -1,5 +1,5 @@
 // ATTENTION: this should be where everything {superblock, bitmaps, inodes, iblocks} exist
-// todo, init individual inodes/blocks when creating data, in nufs.c, only call those init functions, write init here
+
 // this file should be the middleware => operation file
 // created by Nat Tuck
 // mofied by Yifan & Brett
@@ -28,20 +28,11 @@ typedef struct file_data {
 } file_data;
 const int DISK_SIZE = 1024 * 1024; // 1MB
 void *disk;
-//superblock* sprblk;
-// todo when to put metadata to inode & when to put data to iblock???
-//static file_data file_table[] = {
-//    {"/", 040755, 0},
-//    {"/hello.txt", 0100644, "hello\n"},
-//    {0, 0, 0},
-//};
-
 
 void
 storage_init(char *disk_image) {
 
-    printf("in storage_init, disk_image: %s\n", disk_image);
-    // pages_init(disk_image);
+    printf("in storage_init, given disk_image(%s)\n", disk_image);
 
 
     int fd;
@@ -50,7 +41,6 @@ storage_init(char *disk_image) {
         exit(1);
     }
     perror("? ");
-  //  printf("file descriptor maid\n");
 
     int rv = ftruncate(fd, DISK_SIZE);
     assert(rv == 0);
@@ -64,12 +54,6 @@ storage_init(char *disk_image) {
         exit(1);
     }
     printf("in storage_init, mmaped the disk\n");
-//sprblk = (superblock *) disk;
-
-// Had to comment out to try and avoid this error
-
-//    if (superblock_addr()->ibitmap_location == NULL) { // todo ? check a field, because sprblk_addr = disk
-   // printf("superblock making time\n");
     superblock_init(disk);
 
 
@@ -77,10 +61,7 @@ storage_init(char *disk_image) {
     // inodes initilized, fixed sized in storage.h
     // iblocks initilized, fixed sized in storage.h
     // create the root dir and put it to inodes and iblocks
-   // printf("Store file system data in: %s\n", disk_image);
-   // printf("Disk address is at: %p\n", disk);
-    printf("in storage_init, disk_image: %s\n", disk_image);
-    printf("in storage_init, disk_ptr: %p\n", disk);
+    printf("in storage_init, after mmap disk, disk_ptr: %p\n", disk);
 
     // setting up inode_bitmap and iblock_bitmap
     for (int i = 0; i < 256; i++) {
@@ -96,26 +77,19 @@ storage_init(char *disk_image) {
 
     inode_init(root_inode, 040755, 0, 4096); // S_IRWXU | S_IRWXG | S_IRWXO
 
-   // printf("root inode pointer 2 is: %p\n", single_inode_addr(0));
-
-    printf("in storage_init, root inode ptr: %p\n", root_inode);
-   // inodes_addr()[root_dir_idx] = root_inode;
+    printf("in storage_init, calculated root inode ptr(%p)\n", root_inode);
 
     // update inode bitmap
     inode_bitmap_addr()[root_dir_idx] = 1;
-
-   // printf("root inode pointer 1 is: %p\n", inodes_addr()[root_dir_idx]);
 
     //creating iblock root_dir here
     directory *root_iblock = single_iblock_addr(root_dir_idx);
 
     // setting up root_dir block
-    char *root_dir_name = "/"; //todo is it mnt or '/'
+    char *root_dir_name = "/";
     // get dir* from iblocks and initialize the root_dir
     directory_init(root_iblock, root_dir_name);
-//    iblocks_addr()[root_dir_idx] = root_iblock;
     iblock_bitmap_addr()[root_dir_idx] = 1;
-    //printf("root inode pointer is: %p\n", inodes_addr()[root_dir_idx]);
 }
 
 int
@@ -123,23 +97,17 @@ get_entry_index(char *path) {
     // 1. truncate path
     // 2. get inodes
     // 3. get iblocks
-printf("in get_entry_index, given path is: %s\n", path);
+    printf("in get_entry_index, given path is(%s)\n", path);
 
     int current_inode_idx = superblock_addr()->root_inode_idx;
-    directory *root_dir = single_iblock_addr(current_inode_idx); // (directory *) (iblocks_addr()[current_inode_idx]);
+    directory *root_dir = single_iblock_addr(current_inode_idx);
     if (streq(path, root_dir->dir_name)) {
-/*todo merge conflict
-      //  printf("home dir\n");
+        printf("in get_entry_index, path(%s) is home dir, return 0;\n", path);
         return 0;
     }
-    slist *path_list = s_split(path, '/');//  get given dir/file from array
-   // printf("home path: %s\n", path_list->data);
-*/
-        printf("in get_entry_index, given path is home dir\n");
-        return 0;
-    }
-    slist *path_list = s_split(path, '/');//  get given dir/file from array
-    printf("in get_entry_index, home path: %s\n", path_list->data);
+    slist *path_list = s_split(path, '/');
+    printf("in get_entry_index, given path is not home dir, first path(%s)\n", path_list->data);
+    printf("in get_entry_index, root_dir->dir_name(%s)\n", root_dir->dir_name);
 
     //  char* path_array = slist_close(path_list); don't need to use  slist_close returns a pointer to the array
     //todo check if user path starts at home else look at cur_dir path from home
@@ -149,24 +117,13 @@ printf("in get_entry_index, given path is: %s\n", path);
     if (streq(path_list->data, "")) {
         path_list = path_list->next;
     }
-/*if ((path_list->next == NULL) && (path_list->data[0] == "/")) {
-path_list->data =(path_list->data)++;
-printf("in get_entry_index new path_list: %s\n", path_list->data);
-}*/
-	printf("in get_entry_index root directory: %s\n", root_dir->dir_name);
-	printf("in get_entry_index path list: %s\n", path_list->data);
-    /*
-    else {
-        perror("user must give path that starts from home\n");
-    }*/
-    directory* current = root_dir;
+    directory *current = root_dir;
     while (path_list != NULL) {
-        
-	printf("in get_entry_index while loop path list: %s\n", path_list->data);
+        printf("in get_entry_index, entered while loop, current path_list->data(%s)\n", path_list->data);
         // get the index of the entry
         int entry_idx = directory_entry_lookup(current, path_list->data);
         // didn't find the entry
-	printf("in get_entry_index directory entry is: %d\n", entry_idx);
+        printf("in get_entry_index, in while loop, entry_idx(%d)\n", entry_idx);
         if (entry_idx < 0) {
             return -ENOENT; // no such file or dir
         }
@@ -188,37 +145,36 @@ printf("in get_entry_index new path_list: %s\n", path_list->data);
 
 int
 add_dir_entry(char *path, int new_inode_idx) {
-printf("in add dir_entry path :%s, index: %d\n", path, new_inode_idx);
+    printf("in add_dir_entry, given path(%s), new_inode_index(%d)\n", path, new_inode_idx);
     slist *path_list = s_split(path, '/');
-    directory *root_dir = single_iblock_addr(superblock_addr()->root_inode_idx); // (directory *) (iblocks_addr()[superblock_addr()->root_inode_idx]);
+    directory *root_dir = single_iblock_addr(
+            superblock_addr()->root_inode_idx);
 
-printf("in add dir_entry path 1 :%s, index: %d\n", (path_list->next), new_inode_idx);
     // if in root dir, move path_list to the next
     if (streq(path_list->data, "")) {
         path_list = path_list->next;
     }
 
-printf("in add dir_entry path 3:%s, index: %d\n", path, new_inode_idx);
     directory *current = root_dir;
     while (path_list != NULL) {
         // get the index of the entry
         int entry_idx = directory_entry_lookup(current, path_list->data);
         // didn't find the entry, and the path_list is the last in the list
         // make a new entry and put it in cur_dir
-printf("in add dir_entry path 4:%s, index: %d\n", path_list->next, entry_idx);
         if ((entry_idx < 0) && (path_list->next == NULL)) {
-        printf("in add dir_entry about to return\n");
-    // put the entry array in
+            printf("in add_dir_entry, maked a new entry, and insert it to the cur_dir, "
+                           "current_dir_name(%s), new name(%s), new_inode_idx(%d)\n", current->dir_name, path_list->data, new_inode_idx);
+            // put the entry array in
             int new_entry_idx = directory_insert_entry(current, path_list->data, new_inode_idx);
             return new_entry_idx; // success or didn't successfully insert
         } else {
-printf("in add dir_entry path 5:%s, index: %d\n", path, entry_idx);
             // if didn't find it, and the next is not null, throw path doesn't exist exception
             if (entry_idx < 0) {
+                printf("in add_dir_entry, didn't find dir(%s), about to return ENOENT", current->dir_name);
                 return -ENOENT;
-            } 
+            }
 
-printf("in add dir_entry path 6:%s, index: %d\n", path, entry_idx);
+            printf("in add_dir_entry, having find the destination dir/file yet, keep searching\n");
             // haven't finished yet, keep traversing
             dir_ent cur_ent = current->entries[entry_idx];
             int entry_inode_index = cur_ent.entry_inode_index;
@@ -226,14 +182,16 @@ printf("in add dir_entry path 6:%s, index: %d\n", path, entry_idx);
             path_list = path_list->next;
         }
     }
-    return -ENOENT;
+    printf("in add_dir_entry, path_list is = NULL, didn't enter while loop, about to return ENOENT, given path(%s)\n", path);
+    return -EEXIST;
 }
 
 
 int
 remove_dir_entry(char *path) {
     slist *path_list = s_split(path, '/');
-    directory *root_dir = single_iblock_addr(superblock_addr()->root_inode_idx); // (directory *) (iblocks_addr()[superblock_addr()->root_inode_idx]);
+    directory *root_dir = single_iblock_addr(
+            superblock_addr()->root_inode_idx); // (directory *) (iblocks_addr()[superblock_addr()->root_inode_idx]);
 
     // if in root dir, move path_list to the next
     if (streq(path_list->data, root_dir->dir_name)) {
@@ -266,40 +224,45 @@ remove_dir_entry(char *path) {
 
 int
 get_stat(char *path, struct stat *st) {
-   // printf("in get_stat\n");
+    printf("in get_stat, given path(%s)\n", path);
     int index = get_entry_index(path);
     if (index < 0) {
         // didn't find the given path
-        printf("in get_stat, about to return ENOENT, because given path doesn't exist\n");
+        printf("in get_stat, given path doesn't exist, about to return ENOENT\n");
         return -ENOENT;
     }
     // write sizeof(stat) bytes of 0 to st
     memset(st, 0, sizeof(struct stat));
 
-    inode* cur_inode = single_inode_addr(index); // inodes_addr()[index];
+    inode *cur_inode = single_inode_addr(index); // inodes_addr()[index];
     st->st_uid = cur_inode->user_id;
     st->st_mode = cur_inode->mode;
 
     st->st_size = cur_inode->size_of;
+    printf("in get_stat, successfully filled out the st, return 0\n");
     return 0;
 }
 
-void*
+void *
 get_data(char *path) // todo do we always assume the path is a file???????????? no
 {
+    printf("in get_data, given path(%s)\n", path);
     // assuming that the given path is to a file not a directory
     int index = get_entry_index(path);
     if (index < 0) {
+        printf("in get_data, given path doesn't exist, about to return ENOENT\n");
         return -ENOENT;
     }
-    inode* cur_inode = single_inode_addr(index); // inodes_addr()[index];
+    inode *cur_inode = single_inode_addr(index); // inodes_addr()[index];
     // if we are looking at a file
     if (cur_inode->is_file) {
         iblock *cur_iblock = single_iblock_addr(index); // iblocks_addr()[index];
+        printf("in get_data, found the given path to a file, about to return file content\n");
         return cur_iblock->contents;
     }
     // if we are looking at a directory
-    directory* cur_dir = single_iblock_addr(index); // iblocks_addr()[index];
+    directory *cur_dir = single_iblock_addr(index); // iblocks_addr()[index];
+    printf("in get_data, found the given path to a dir, about to return cur_dir_ptr(%p)\n", cur_dir);
     return cur_dir;
 }
 
