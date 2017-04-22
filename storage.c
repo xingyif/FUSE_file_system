@@ -149,10 +149,11 @@ printf("in get_entry_index, given path is: %s\n", path);
     if (streq(path_list->data, root_dir->dir_name)) {
         path_list = path_list->next;
     }
+
+	printf("in get_entry_index root directory: %s\n", root_dir->dir_name);
+	printf("in get_entry_index path list: %s\n", path_list->data);
     /*
     else {
-	printf("current directory: %s\n", cur_dir->dir_name);
-	printf("path list: %s\n", path_list->data);
         perror("user must give path that starts from home\n");
     }*/
     directory* current = root_dir;
@@ -182,7 +183,7 @@ printf("in get_entry_index, given path is: %s\n", path);
 int
 add_dir_entry(char *path, int new_inode_idx) {
 printf("in add dir_entry path :%s, index: %d\n", path, new_inode_idx);
-    slist *path_list = s_split(path, "/");
+    slist *path_list = s_split(path, '/');
     directory *root_dir = single_iblock_addr(superblock_addr()->root_inode_idx); // (directory *) (iblocks_addr()[superblock_addr()->root_inode_idx]);
 
 printf("in add dir_entry path 1 :%s, index: %d\n", (path_list->next), new_inode_idx);
