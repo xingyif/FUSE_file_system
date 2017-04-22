@@ -72,6 +72,7 @@ nufs_getattr(const char *path, struct stat *st) {
 int
 nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
              off_t offset, struct fuse_file_info *fi) {
+printf("in nufs_readdir\n");
     struct stat st;
     int index = get_entry_index(path);
     if (index < 0) {
@@ -310,10 +311,10 @@ nufs_open(const char *path, struct fuse_file_info *fi) {
         return -ENOENT; // path doesn't exist
     }
     // todo do i need to check for read only???????????????????????????????????????????????????????????
-    // checks if it is read only
+    /* checks if it is read only
     if ((fi->flags & 3) != O_RDONLY) {
         return -EACCES; // no access to file
-    }
+    }*/
 
     return 0;
 }
@@ -336,23 +337,24 @@ nufs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_fi
     if (offset > cur_inode->size_of) {
         return 0;
     }
+pread(fi->fh, buf, size,offset);
     /*
     int len = strlen(data) + 1;
     if (size < len) {
         len = size;
     }*/
-
+/* todo doesn't work
     char *new_blk;
     for (int position = offset; position < offset + size;) {
         memmove(buf, new_blk + position % 4096, 4096 - position % 4096);
-    }
+    } */
     return size;
 }
 
 // Actually write data
 int
 nufs_write(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
-    printf("write(%s, %ld bytes, @%ld)\n", path, size, offset);
+    printf("write(%s, %d bytes, @%d, %s buf)\n", path, size, offset, buf);
 // get iblock index for this path
     int index = get_entry_index(path);
 // get block with the index
@@ -360,10 +362,12 @@ nufs_write(const char *path, const char *buf, size_t size, off_t offset, struct 
     if (offset + size > 4096) {
         return -ENOENT;
     }
+pwrite(fi->fh,buf,size,offset);
+/* doesn't work
     char *new_blk;
-    for (int position = offset; position < offset + size;) {
+for (int position = offset; position < offset + size;) {  
         memmove(new_blk + position % 4096, buf, 4096 - position % 4096);
-    }
+    }*/
     return size;
 }
 

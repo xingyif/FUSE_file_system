@@ -44,6 +44,7 @@ s_split(const char* text, char delim)
     }
 
     int plen = 0;
+
     while (text[plen] != 0 && text[plen] != delim) {
         plen += 1;
     }

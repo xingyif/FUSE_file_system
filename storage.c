@@ -138,7 +138,7 @@ printf("in get_entry_index, given path is: %s\n", path);
         printf("in get_entry_index, given path is home dir\n");
         return 0;
     }
-    slist *path_list = s_split(path, '/');//  get given dir/file from array
+    slist *path_list = s_split(path, "/");//  get given dir/file from array
     printf("in get_entry_index, home path: %s\n", path_list->data);
 
     //  char* path_array = slist_close(path_list); don't need to use  slist_close returns a pointer to the array
@@ -149,7 +149,10 @@ printf("in get_entry_index, given path is: %s\n", path);
     if (streq(path_list->data, root_dir->dir_name)) {
         path_list = path_list->next;
     }
-
+/*if ((path_list->next == NULL) && (path_list->data[0] == "/")) {
+path_list->data =(path_list->data)++;
+printf("in get_entry_index new path_list: %s\n", path_list->data);
+}*/
 	printf("in get_entry_index root directory: %s\n", root_dir->dir_name);
 	printf("in get_entry_index path list: %s\n", path_list->data);
     /*
@@ -158,9 +161,12 @@ printf("in get_entry_index, given path is: %s\n", path);
     }*/
     directory* current = root_dir;
     while (path_list != NULL) {
+        
+	printf("in get_entry_index while loop path list: %s\n", path_list->data);
         // get the index of the entry
         int entry_idx = directory_entry_lookup(current, path_list->data);
         // didn't find the entry
+	printf("in get_entry_index directory entry is: %d\n", entry_idx);
         if (entry_idx < 0) {
             return -ENOENT; // no such file or dir
         }
@@ -183,7 +189,7 @@ printf("in get_entry_index, given path is: %s\n", path);
 int
 add_dir_entry(char *path, int new_inode_idx) {
 printf("in add dir_entry path :%s, index: %d\n", path, new_inode_idx);
-    slist *path_list = s_split(path, '/');
+    slist *path_list = s_split(path, "/");
     directory *root_dir = single_iblock_addr(superblock_addr()->root_inode_idx); // (directory *) (iblocks_addr()[superblock_addr()->root_inode_idx]);
 
 printf("in add dir_entry path 1 :%s, index: %d\n", (path_list->next), new_inode_idx);

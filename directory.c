@@ -6,6 +6,7 @@
 #include <memory.h> // imported for memset in dir_del_entry
 #include "directory.h"
 #include "slist.h"
+#include "util.h"
 const int FILE_NAME_LENGTH  = 27;
 const int DIR_ENT_SIZE  = 32;
 
@@ -25,13 +26,15 @@ directory_init(directory* cur_dir, char* name) {
 int
 directory_entry_lookup(directory* dir, char* name) {
     int num_of_entries = dir->number_of_entries;
-    for (int i = 0; i < num_of_entries; i++) {
+printf("in directory_entry_lookup dir: %s, entry: %s\n", dir->dir_name, name);
+    for (int i = 0; i < DIR_ENT_SIZE; i++) {
         dir_ent current_entry = dir->entries[i];
         // if current_try == NULL
+printf("in directory_entry_lookup index: %d, entry: %s\n", i, current_entry.filename);
         if (current_entry.filename == NULL) {
             continue;
         }
-        if (current_entry.filename == name) {
+        if (streq(current_entry.filename, name)) {
             return i;//cur_dir->entries[directory_lookup(cur_dir, "blah")]->entry_node_index;
         }
     }
