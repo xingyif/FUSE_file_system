@@ -81,7 +81,7 @@ printf("in nufs_readdir path: %s buf:%s offset: %d\n", path, buf, offset);
     //inode *cur_inode = single_inode_addr(index);
     directory *cur_dir = single_iblock_addr(index);
 printf("in nufs_readdir cur_dir name: %s\n", cur_dir->dir_name);
-    for (int i = 0; i < cur_dir->number_of_entries; i++) {
+    for (int i = 0; i < 32; i++) {
         dir_ent cur_ent = cur_dir->entries[i];
 
         //offset += (i * sizeof(dir_ent));
