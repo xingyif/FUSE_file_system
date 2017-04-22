@@ -19,9 +19,6 @@ directory_init(directory* cur_dir, char* name) {
     cur_dir->dir_name = name;
     cur_dir->number_of_entries = 0;
     // entries are fixed size array
-    for (int i = 0; i < DIR_ENT_SIZE; i++) {
-        cur_dir->entries[i] = NULL;
-    }
 }
 
 // look for the entry index of a name inside a dir
@@ -82,7 +79,6 @@ directory_del_entry(directory* dir, int entry_idx) {
     }
     dir_ent cur_entry = dir->entries[entry_idx];
     memset(cur_entry.filename, 0, FILE_NAME_LENGTH);
-    dir->entries[entry_idx] = NULL;
     dir->number_of_entries--;
     return 0;
 }
