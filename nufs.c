@@ -327,7 +327,7 @@ nufs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_fi
     // checks if the path exists
     int index = get_entry_index(path);
     if (index < 0) {//what if we are creating a new text??
-        return -1; // ENOENT: path doesn't exist
+        return -ENOENT; // ENOENT: path doesn't exist
     }
 
     // data can be file contents or directory contents
@@ -348,7 +348,7 @@ pread(fi->fh, buf, size,offset);
     for (int position = offset; position < offset + size;) {
         memmove(buf, new_blk + position % 4096, 4096 - position % 4096);
     } */
-    return size;
+    return 0;
 }
 
 // Actually write data
@@ -368,7 +368,7 @@ pwrite(fi->fh,buf,size,offset);
 for (int position = offset; position < offset + size;) {  
         memmove(new_blk + position % 4096, buf, 4096 - position % 4096);
     }*/
-    return size;
+    return 0;
 }
 
 void
