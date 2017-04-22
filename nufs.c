@@ -327,7 +327,7 @@ nufs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_fi
     // checks if the path exists
     int index = get_entry_index(path);
     if (index < 0) {//what if we are creating a new text??
-        return -1; // ENOENT: path doesn't exist
+        return -ENOENT; // ENOENT: path doesn't exist
     }
 
     // data can be file contents or directory contents
@@ -371,7 +371,6 @@ return -EISDIR;
 for (int position = offset; position < offset + size;) {  
         memmove(new_blk + position % 4096, buf, 4096 - position % 4096);
     }*/
-
 	memove(cur_block+offset,buf,size);
     return size;
 }
