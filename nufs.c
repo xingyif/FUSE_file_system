@@ -63,7 +63,7 @@ nufs_getattr(const char *path, struct stat *st) {
     printf("In nufs_getattr(%s)\n", path); // debugging purpose
     // get_stat will check if file/dir exist
     int rv = get_stat(path, st);
-    printf("get_attr(%s) -> (%d) {mode: %04o}\n", path, rv, st->st_mode);
+    printf("get_attr(%s) -> (%d) {mode: %04o, size: %d}\n", path, rv, st->st_mode, st->st_size);
     return rv;
 }
 
@@ -72,23 +72,37 @@ nufs_getattr(const char *path, struct stat *st) {
 int
 nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
              off_t offset, struct fuse_file_info *fi) {
-printf("in nufs_readdir\n");
-    struct stat st;
+printf("in nufs_readdir path: %s buf:%s offset: %d\n", path, buf, offset);
+    
     int index = get_entry_index(path);
     if (index < 0) {
         return -ENOENT; // path doesn't exist
     }
-    inode *cur_inode = single_inode_addr(index);
+    //inode *cur_inode = single_inode_addr(index);
     directory *cur_dir = single_iblock_addr(index);
-
-    for (int i = 0; i < 32; i++) {
+printf("in nufs_readdir cur_dir name: %s\n", cur_dir->dir_name);
+    for (int i = 0; i < cur_dir->number_of_entries; i++) {
         dir_ent cur_ent = cur_dir->entries[i];
-        offset += (i * sizeof(dir_ent));
+
+        //offset += (i * sizeof(dir_ent));
         // if cur_ent == NULL
         if (cur_ent.filename == NULL) {
             continue;
-        } else if (filler(buf, cur_ent.filename, &st, offset) != 0) {
-            return 0;
+        } else {
+/*
+	inode *cur_inode = single_inode_addr(cur_ent.entry_inode_index);
+printf("in nufs_readdir about to memset\n");
+	memset(st, 0, sizeof(struct stat));
+printf("in nufs_readdir1, found the entry(%s) in given dir(%s), return entry_index(%d)\n", cur_ent.filename, cur_dir->dir_name, i);
+        st->st_uid = cur_inode->user_id;
+    st->st_mode = cur_inode->mode;
+
+printf("in nufs_readdir2, found the entry(%s) in given dir(%s), return entry_index(%d)\n", cur_ent.filename, cur_dir->dir_name, i);
+    st->st_size = cur_inode->size_of;*/
+   filler(buf, cur_ent.filename, NULL, 0); 
+
+printf("in nufs_readdir3, found the entry(%s) in given dir(%s), return entry_index(%d)\n", cur_ent.filename, cur_dir->dir_name, i);
+            continue;
         }
     }
     printf("readdir(%s)\n", path);
@@ -354,7 +368,7 @@ memcpy(buf, cur_iblock + offset, size);
 
 printf("in read after memcpy buf: %s\n", buf);
 
-    return strlen(cur_iblock)-offset;
+    return strlen(buf);
 }
 
 // Actually write data
@@ -379,7 +393,8 @@ for (int position = offset; position < offset + size;) {
     }*/
 	memcpy(cur_block + offset, buf, size);
 printf("in write afte memcpy at cur_block: %s\n", cur_block);
-
+inode *cur_inode = single_inode_addr(index);
+cur_inode->size_of = size;
     return size;
 }
 
