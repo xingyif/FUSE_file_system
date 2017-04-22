@@ -348,7 +348,7 @@ pread(fi->fh, buf, size,offset);
     for (int position = offset; position < offset + size;) {
         memmove(buf, new_blk + position % 4096, 4096 - position % 4096);
     } */
-    return size;
+    return 0;
 }
 
 // Actually write data
@@ -357,17 +357,22 @@ nufs_write(const char *path, const char *buf, size_t size, off_t offset, struct 
     printf("write(%s, %d bytes, @%d, %s buf)\n", path, size, offset, buf);
 // get iblock index for this path
     int index = get_entry_index(path);
+    if (index < 0) {
+return -EISDIR;
+}
 // get block with the index
     iblock *cur_block = single_iblock_addr(index);
     if (offset + size > 4096) {
         return -ENOENT;
     }
-pwrite(fi->fh,buf,size,offset);
+//pwrite(fi->fh,buf,size,offset);
 /* doesn't work
     char *new_blk;
 for (int position = offset; position < offset + size;) {  
         memmove(new_blk + position % 4096, buf, 4096 - position % 4096);
     }*/
+
+	memove(cur_block+offset,buf,size);
     return size;
 }
 
