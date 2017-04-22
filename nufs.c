@@ -152,7 +152,7 @@ nufs_mkdir(const char *path, mode_t mode) {
     // checks if the path exists
     int index = get_entry_index(path);
     if (index >= 0) {
-     //   return -EEXIST; // path already exists
+        return -EEXIST; // path already exists
     }
 
     int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
@@ -161,10 +161,7 @@ nufs_mkdir(const char *path, mode_t mode) {
     }
     // create the new inode ptr
     inode *cur_inode = single_inode_addr(aval_idx);
-//    inodes_addr()[aval_idx] = cur_inode;
     inode_init(cur_inode, mode, 1, 0);
-    // flush the inode ptr to disk
-    inodes_addr()[aval_idx] = cur_inode;
     // update inode_bitmap
     inode_bitmap_addr()[aval_idx] = 1;
 
@@ -199,7 +196,7 @@ nufs_unlink(const char *path) {
         return -ENOENT; // path doesn't exist
     }
 
-    inode* cur_inode = inodes_addr()[index]; // todo change to single_addr.. ?
+    inode* cur_inode = single_inode_addr(index);
     // given path is a dir not a file
     if (!cur_inode->is_file) {
         return -EISDIR;
@@ -211,9 +208,6 @@ nufs_unlink(const char *path) {
     // set the bitmaps to be avaliable
     inode_bitmap_addr()[index] = 0;
     iblock_bitmap_addr()[index] = 0;
-    // todo don't need set cur_inode & cur_iblock to be null
-    iblocks_addr()[index] = NULL;
-    inodes_addr()[index] = NULL;
 
     return rv; // success or failure
 }
@@ -227,13 +221,16 @@ nufs_rmdir(const char *path) {
         return index; // ENOENT: path doesn't exist
     }
 
+    inode* cur_inode = single_inode_addr(index);
+    // given path is a dir not a file
+    if (cur_inode->is_file) {
+        return -ENOTDIR; // given path is not dir
+    }
+
     int rv = remove_dir_entry(path);
     // update the bitmaps
     inode_bitmap_addr()[index] = 0;
     iblock_bitmap_addr()[index] = 0;
-    // todo not needed remove inode, and remove iblock_ptrs at the given index
-    inodes_addr()[index] = NULL;
-    iblocks_addr()[index] = NULL;
 
     return rv; // success or failure
 }
@@ -264,8 +261,8 @@ nufs_rename(const char *from, const char *to) {
         return 0;
     }
 
-    inode *from_inode = inodes_addr()[from_index];
-    iblock *from_iblock = iblocks_addr()[from_index];
+    inode *from_inode = single_inode_addr(from_index);
+    iblock *from_iblock = single_iblock_addr(from_index);
 
     // create inode & iblock for to
     inode *to_inode = single_inode_addr(to_index);
