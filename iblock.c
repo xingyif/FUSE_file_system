@@ -1,21 +1,13 @@
 #include <string.h>
 #include <errno.h>
-#include <stdlib.h>
 #include "iblock.h"
 #include "superblock.h"
 #include "storage.h"
-// todo rewrite this for init, free, and get(if null, init)
 
-const int NUFS_SIZE  = 1024 * 1024; // 1MB
 const int IBLOCK_SIZE = 1024 * 4; // = 4096 = 4k block
 const int IBLOCK_COUNT = 256;
 
-int iblock_bitmap[256];
-void* iblocks[256]; 
 
-static int   iblock_fd   = -1;
-//static void* iblock_ptr =  0;
-//superblock sprblk = *superblock_addr(); 
 // initialize a single 4k block
 void
 iblock_init(iblock* cur_block)
@@ -26,17 +18,6 @@ iblock_init(iblock* cur_block)
     // the regular file named by path or referenced by fd to be truncated to a size of precisely length bytes.
 //    int rv = ftruncate(iblock_fd, NUFS_SIZE);
 //    assert(rv == 0); // success
-
-//    iblock* iblock_ptr = malloc(IBLOCK_SIZE); // mmap(0, IBLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, iblock_fd, 0);
-//    assert(iblock_ptr != MAP_FAILED);
-//    cur_block->contents;
-//    return iblock_ptr;
-}
-
-void
-iblock_free(iblock* iblock_ptr)
-{
-    free(iblock_ptr); // munmap(iblock_ptr, IBLOCK_SIZE);
 }
 
 //// find an empty spot in iblocks, insert the given iblock, return the index of where the iblock is stored or failure
@@ -66,20 +47,7 @@ iblock_bitmap_find_next_empty(int* iblock_bitmap_ptr)
     }
     return iblock_index;
 }
-/*
-void
-print_node(inode* node)
-{
-    if (node) {
-        printf("node{user_id: %d, mode: %04o, size: %d, is_file: %d}\n",
-               node->user_id, node->mode, node->size_of, node->is_file);
-    }
-    else {
-        printf("node{null}\n");
-    }
-}
 
-*/
 void**
 iblocks_addr() {
     return (void**) get_disk() + superblock_addr()->iblocks;

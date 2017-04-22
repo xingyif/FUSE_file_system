@@ -7,17 +7,6 @@
 #include <unistd.h>
 #include <errno.h>
 #include "superblock.h"
-int ROOT_DIR_IDX = 0;
-
-//sprblk = superblock_addr();
-
-//const int INODE_COUNT = 256;
-//static void* inode_ptr =  0;
-//static int   inode_fd   = -1;
-
-//inode* inodes[256];
-//int inode_bitmap[256];
-
 void
 inode_init(inode* cur_inode, mode_t mode, int is_file, size_t size) {
 //    inode_fd = open(path, O_CREAT | O_RDWR, 0644);
@@ -26,9 +15,6 @@ inode_init(inode* cur_inode, mode_t mode, int is_file, size_t size) {
     // the regular file named by path or referenced by fd to be truncated to a size of precisely length bytes.
 //    int rv = ftruncate(iblock_fd, NUFS_SIZE);
 //    assert(rv == 0); // success
-
-//    inode* inode_ptr = malloc(sizeof(inode)); // mmap(0, sizeof(inode), PROT_READ | PROT_WRITE, MAP_SHARED, inode_fd, 0);
-//    assert(inode_ptr != MAP_FAILED);
 
     // good default mode
     // Directory: 040755
@@ -43,7 +29,6 @@ inode_init(inode* cur_inode, mode_t mode, int is_file, size_t size) {
 }
 void
 inode_remove(inode* inode_ptr) {
-// todo
 }
 
 // find an empty spot in inodes, insert the given inode, return the index of where the inode is stored or failure
@@ -78,11 +63,9 @@ inode_bitmap_find_next_empty(int* inode_bitmap_ptr)
     return inode_index;
 }
 
-inode**
+inode*
 inodes_addr() {
-//printf("superblock address is at: %p\n", superblock_addr());
-//printf("Disk address pinter is at: %p\n", get_disk());
-    return (inode**) (get_disk() + superblock_addr()->inodes);
+    return (inode*) (get_disk() + superblock_addr()->inodes);
 }
 
 int*
@@ -92,6 +75,5 @@ inode_bitmap_addr() {
 
 void*
 single_inode_addr(int idx) {
-//   printf("inode address is at: %p\n", inodes_addr());
     return (void*) (inodes_addr() + sizeof(inode) * idx);
 }

@@ -12,7 +12,7 @@ typedef struct dir_ent {
 
 typedef struct directory {
 	char* dir_name; //the maximum name length is 27 bytes, allowing entries to always have terminating 0 bytes
-    dir_ent* entries[32]; // Pointer to entries
+    dir_ent entries[32]; // Pointer to entries
     int number_of_entries;
 } directory;
 

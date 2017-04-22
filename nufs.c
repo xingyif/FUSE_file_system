@@ -77,26 +77,20 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     if (index < 0) {
         return -ENOENT; // path doesn't exist
     }
-    // todo why do you create new inode and dir???????????????????????????????
-//    inode *cur_inode = inodes_addr()[index];
-//    directory *cur_dir = iblocks_addr()[index];
-
     inode *cur_inode = single_inode_addr(index);
     directory *cur_dir = single_iblock_addr(index);
 
     for (int i = 0; i < 32; i++) {
-        dir_ent *cur_ent = cur_dir->entries[i];
+        dir_ent cur_ent = cur_dir->entries[i];
         offset += (i * sizeof(dir_ent));
-        if (cur_ent == NULL) {
+        // if cur_ent == NULL
+        if (cur_ent.filename == NULL) {
             continue;
-        } else if (filler(buf, cur_ent->filename, &st, offset) != 0) {
-
+        } else if (filler(buf, cur_ent.filename, &st, offset) != 0) {
             return 0;
         }
     }
     printf("readdir(%s)\n", path);
-
-
 
     //   get_stat("/", &st);
     // filler is a callback that adds one item to the result
@@ -127,20 +121,14 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev) {
         return aval_idx;
     }
 
-    // create the new inode ptr
+    // find the new inode ptr
     inode *cur_inode = single_inode_addr(aval_idx);
-//    inodes_addr()[aval_idx] = cur_inode;
+    // initialized inode and the inode struct is stored in disk
     inode_init(cur_inode, mode, 1, 0);
-    // flush the inode ptr to disk
-    inodes_addr()[aval_idx] = cur_inode;
-    // put the initialized inode to inodes
     // update inode_bitmap
     inode_bitmap_addr()[aval_idx] = 1;
 
-    // create the new iblock ptr
-    iblock *cur_iblock = single_iblock_addr(aval_idx);
-    // flush the iblock ptr to disk
-    iblocks_addr()[aval_idx] = cur_iblock;
+    // find the new iblock ptr
     // update the iblock_bitmap
     iblock_bitmap_addr()[aval_idx] = 1;
 
