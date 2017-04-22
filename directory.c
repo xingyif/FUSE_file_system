@@ -42,7 +42,8 @@ directory_entry_lookup(directory* dir, char* name) {
 int
 directory_insert_entry(directory* dir, char* name, int inode_index) {
     int num_of_entries = dir->number_of_entries;
-    if (num_of_entries >= DIR_ENT_SIZE) {
+printf("in directory_insert_entry inode_index: %d\n", inode_index);   
+ if (num_of_entries >= DIR_ENT_SIZE) {
         printf("No room to store more in the current directory!");
         return -ENOSPC;
     }
@@ -52,17 +53,21 @@ directory_insert_entry(directory* dir, char* name, int inode_index) {
         return -ENOSPC;
     }
     // initialize the entry
+printf("in directory_insert_entry 1\n");   
     dir_ent new_entry;
     new_entry.filename = name;
     new_entry.entry_inode_index = inode_index;
     // find an empty spot in entries[], and insert it
-    for (int i = 0; i < num_of_entries; i++) {
+    for (int i = 0; i < DIR_ENT_SIZE; i++) {
         dir_ent current_entry = dir->entries[i];
+printf("in directory_insert_entry looking at index: %d\n", i);   
         // insert new entry
         // if current_entry == NULL
         if (current_entry.filename == NULL) {
             dir->entries[i] = new_entry;
             dir->number_of_entries++;
+
+printf("in directory_insert_entry going to return at index: %d\n", i);   
             return i;
         }
     }

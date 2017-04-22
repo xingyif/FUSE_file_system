@@ -123,7 +123,11 @@ get_entry_index(char *path) {
     // 1. truncate path
     // 2. get inodes
     // 3. get iblocks
-    if (*path == '/') {
+printf("in get_entry_index, given path is: %s\n", path);
+
+    int current_inode_idx = superblock_addr()->root_inode_idx;
+    directory *root_dir = single_iblock_addr(current_inode_idx); // (directory *) (iblocks_addr()[current_inode_idx]);
+    if (streq(path, root_dir->dir_name)) {
 /*todo merge conflict
       //  printf("home dir\n");
         return 0;
@@ -140,8 +144,6 @@ get_entry_index(char *path) {
     //  char* path_array = slist_close(path_list); don't need to use  slist_close returns a pointer to the array
     //todo check if user path starts at home else look at cur_dir path from home
     // fixme addr() returns ** because can't case void to directory
-    int current_inode_idx = superblock_addr()->root_inode_idx;
-    directory *root_dir = single_iblock_addr(current_inode_idx); // (directory *) (iblocks_addr()[current_inode_idx]);
     //todo assuming that user is giving path that either starts with home dir or entry in home dir
     // get to the name we are looking for
     if (streq(path_list->data, root_dir->dir_name)) {
@@ -179,29 +181,37 @@ get_entry_index(char *path) {
 
 int
 add_dir_entry(char *path, int new_inode_idx) {
-    slist *path_list = s_split(path, '/');
+printf("in add dir_entry path :%s, index: %d\n", path, new_inode_idx);
+    slist *path_list = s_split(path, "/");
     directory *root_dir = single_iblock_addr(superblock_addr()->root_inode_idx); // (directory *) (iblocks_addr()[superblock_addr()->root_inode_idx]);
 
+printf("in add dir_entry path 1 :%s, index: %d\n", (path_list->next), new_inode_idx);
     // if in root dir, move path_list to the next
     if (streq(path_list->data, root_dir->dir_name)) {
         path_list = path_list->next;
     }
 
+printf("in add dir_entry path 3:%s, index: %d\n", path, new_inode_idx);
     directory *current = root_dir;
     while (path_list != NULL) {
         // get the index of the entry
         int entry_idx = directory_entry_lookup(current, path_list->data);
         // didn't find the entry, and the path_list is the last in the list
         // make a new entry and put it in cur_dir
+printf("in add dir_entry path 4:%s, index: %d\n", path_list->next, entry_idx);
         if ((entry_idx < 0) && (path_list->next == NULL)) {
-            // put the entry array in
+        printf("in add dir_entry about to return\n");
+    // put the entry array in
             int new_entry_idx = directory_insert_entry(current, path_list->data, new_inode_idx);
             return new_entry_idx; // success or didn't successfully insert
         } else {
+printf("in add dir_entry path 5:%s, index: %d\n", path, entry_idx);
             // if didn't find it, and the next is not null, throw path doesn't exist exception
             if (entry_idx < 0) {
                 return -ENOENT;
-            }
+            } 
+
+printf("in add dir_entry path 6:%s, index: %d\n", path, entry_idx);
             // haven't finished yet, keep traversing
             dir_ent cur_ent = current->entries[entry_idx];
             int entry_inode_index = cur_ent.entry_inode_index;

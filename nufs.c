@@ -115,12 +115,14 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev) {
         return -EEXIST; // path already exist
     }
 
+    printf("in nufs_mknod 1:(%s, %04o)\n", path, mode);
     int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
     if (aval_idx < 0) {
         // ENOSPC: operation failed due to lack of disk space
         return aval_idx;
     }
 
+    printf("in nufs_mknod 2:(%s, %04o)\n", path, mode);
     // find the new inode ptr
     inode *cur_inode = single_inode_addr(aval_idx);
     // initialized inode and the inode struct is stored in disk
@@ -132,6 +134,7 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev) {
     // update the iblock_bitmap
     iblock_bitmap_addr()[aval_idx] = 1;
 
+    printf("in nufs_mknod 3:(%s, %04o)\n", path, mode);
     // create an entry and add the new entry to its own home dir
     int new_entry_idx = add_dir_entry(path, aval_idx);
     if (new_entry_idx < 0) {
