@@ -138,7 +138,7 @@ printf("in get_entry_index, given path is: %s\n", path);
         printf("in get_entry_index, given path is home dir\n");
         return 0;
     }
-    slist *path_list = s_split(path, "/");//  get given dir/file from array
+    slist *path_list = s_split(path, '/');//  get given dir/file from array
     printf("in get_entry_index, home path: %s\n", path_list->data);
 
     //  char* path_array = slist_close(path_list); don't need to use  slist_close returns a pointer to the array
@@ -189,7 +189,7 @@ printf("in get_entry_index new path_list: %s\n", path_list->data);
 int
 add_dir_entry(char *path, int new_inode_idx) {
 printf("in add dir_entry path :%s, index: %d\n", path, new_inode_idx);
-    slist *path_list = s_split(path, "/");
+    slist *path_list = s_split(path, '/');
     directory *root_dir = single_iblock_addr(superblock_addr()->root_inode_idx); // (directory *) (iblocks_addr()[superblock_addr()->root_inode_idx]);
 
 printf("in add dir_entry path 1 :%s, index: %d\n", (path_list->next), new_inode_idx);
