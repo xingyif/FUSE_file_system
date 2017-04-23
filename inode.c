@@ -13,7 +13,6 @@ inode_init(inode* cur_inode, mode_t mode, int is_file, size_t size) {
     // Directory: 040755
     // Regular file: 0100644
 
-    // todo, should inode contain file name
     cur_inode->user_id = getuid();
     cur_inode->mode = mode;
     cur_inode->is_file = is_file;

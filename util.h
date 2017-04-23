@@ -25,13 +25,4 @@ clamp(int x, int v0, int v1) {
     return max(v0, min(x, v1));
 }
 
-/*this functionality makes no sense just look through slist not through array
-slist*
-slist_last(slist *list) {
-    while(list->next != NULL) {
-	list = list->next;
-}
-    return list;
-}
-*/
 #endif
