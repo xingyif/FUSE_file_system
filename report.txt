@@ -1,6 +1,7 @@
 hw 12
 Yifan Xing & Brett Krutiansky
-Submission is identical to partner's submission.
+Submission is slightly different from partner's submission.
+Difference is in storage.c file in storage_init function.
 
 The advantage to building your file system, like the one we did on this homework,
 is the flexibility to tailor the file system to your needs. It is like building a

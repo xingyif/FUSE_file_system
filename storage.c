@@ -21,8 +21,8 @@
 const int DISK_SIZE = 1024 * 1024; // 1MB
 void *disk;
 static int has_set_sprblk = -1;
-static int   pages_fd   = -1;
-static void* pages_base = 0;
+static int pages_fd = -1;
+static void *pages_base = 0;
 
 void
 storage_init(char *disk_image) {
@@ -36,40 +36,40 @@ storage_init(char *disk_image) {
     pages_base = mmap(0, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, pages_fd, 0);
     assert(pages_base != MAP_FAILED);
     if (has_set_sprblk == -1) {
-      has_set_sprblk = 1;
-      superblock_init(pages_base);
+        has_set_sprblk = 1;
+        superblock_init(pages_base);
 
-    // setting up inode_bitmap and iblock_bitmap
-    for (int i = 0; i < 256; i++) {
-        inode_bitmap_addr()[i] = 0;
-        iblock_bitmap_addr()[i] = 0;
-    }
+        // setting up inode_bitmap and iblock_bitmap
+        for (int i = 0; i < 256; i++) {
+            inode_bitmap_addr()[i] = 0;
+            iblock_bitmap_addr()[i] = 0;
+        }
 
-    // setting up root_dir inode
-    superblock *sprblk_addr = superblock_addr();
-    int root_dir_idx = sprblk_addr->root_inode_idx;
-    // get inode* from inodes
-    inode *root_inode = single_inode_addr(root_dir_idx);
-    inode_init(root_inode, 040755, 0, 4096); // S_IRWXU | S_IRWXG | S_IRWXO
+        // setting up root_dir inode
+        superblock *sprblk_addr = superblock_addr();
+        int root_dir_idx = sprblk_addr->root_inode_idx;
+        // get inode* from inodes
+        inode *root_inode = single_inode_addr(root_dir_idx);
+        inode_init(root_inode, 040755, 0, 4096); // S_IRWXU | S_IRWXG | S_IRWXO
 
 
-    // update inode bitmap
-    inode_bitmap_addr()[root_dir_idx] = 1;
+        // update inode bitmap
+        inode_bitmap_addr()[root_dir_idx] = 1;
 
-    //creating iblock root_dir here
-    directory *root_iblock = single_iblock_addr(root_dir_idx);
-    // setting up root_dir block
-    char *root_dir_name = "/";
-    // get dir* from iblocks and initialize the root_dir
-    directory_init(root_iblock, root_dir_name);
+        //creating iblock root_dir here
+        directory *root_iblock = single_iblock_addr(root_dir_idx);
+        // setting up root_dir block
+        char *root_dir_name = "/";
+        // get dir* from iblocks and initialize the root_dir
+        directory_init(root_iblock, root_dir_name);
 
-    // update iblock bitmap
-    iblock_bitmap_addr()[root_dir_idx] = 1;
+        // update iblock bitmap
+        iblock_bitmap_addr()[root_dir_idx] = 1;
     }
 }
 
 int
-get_entry_index(char *path) {
+get_entry_index(const char *path) {
     // 1. truncate path
     // 2. get inodes
     // 3. get iblocks
@@ -110,7 +110,7 @@ get_entry_index(char *path) {
 }
 
 int
-add_dir_entry(char *path, int new_inode_idx) {
+add_dir_entry(const char *path, int new_inode_idx) {
     slist *path_list = s_split(path, '/');
     directory *root_dir = single_iblock_addr(
             superblock_addr()->root_inode_idx);
@@ -148,7 +148,7 @@ add_dir_entry(char *path, int new_inode_idx) {
 
 
 int
-remove_dir_entry(char *path) {
+remove_dir_entry(const char *path) {
     slist *path_list = s_split(path, '/');
     directory *root_dir = single_iblock_addr(
             superblock_addr()->root_inode_idx);
@@ -183,7 +183,7 @@ remove_dir_entry(char *path) {
 }
 
 int
-get_stat(char *path, struct stat *st) {
+get_stat(const char *path, struct stat *st) {
     int index = get_entry_index(path);
     if (index < 0) {
         // didn't find the given path
@@ -201,8 +201,7 @@ get_stat(char *path, struct stat *st) {
 }
 
 void *
-get_data(char *path)
-{
+get_data(const char *path) {
     // assuming that the given path is to a file not a directory
     int index = get_entry_index(path);
     if (index < 0) {
@@ -226,8 +225,7 @@ get_disk() {
 }
 
 void
-storage_free()
-{
+storage_free() {
     int rv = munmap(pages_base, DISK_SIZE);
     assert(rv == 0);
 }
