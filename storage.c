@@ -29,30 +29,40 @@ typedef struct file_data {
 const int DISK_SIZE = 1024 * 1024; // 1MB
 void *disk;
 
+static int   pages_fd   = -1;
+static void* pages_base =  0;
+
 void
 storage_init(char *disk_image) {
 
     printf("in storage_init, given disk_image(%s)\n", disk_image);
+    pages_fd = open(disk_image, O_CREAT | O_RDWR, 0644);
+    assert(pages_fd != -1);
 
-
-    int fd;
-    if ((fd = open(disk_image, O_CREAT | O_RDWR, 0644)) == -1) {
-        perror("Opening disk image failed!");
-        exit(1);
-    }
-    perror("? ");
-
-    int rv = ftruncate(fd, DISK_SIZE);
+    int rv = ftruncate(pages_fd, DISK_SIZE);
     assert(rv == 0);
 
-    // returns a non-negative integer, termed a file descriptor.  It returns -1 on failure, and sets
-    // errno to indicate the error return - value if failed
-    // initialize superblock if it has never been initialized before
-    disk = mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-    if (disk == MAP_FAILED) {
-        perror("Couldn't map image");
-        exit(1);
-    }
+    pages_base = mmap(0, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, pages_fd, 0);
+    assert(pages_base != MAP_FAILED);
+
+//    int fd;
+//    if ((fd = open(disk_image, O_CREAT | O_RDWR, 0644)) == -1) {
+//        perror("Opening disk image failed!");
+//        exit(1);
+//    }
+//    perror("? ");
+//
+//    int rv = ftruncate(fd, DISK_SIZE);
+//    assert(rv == 0);
+//
+//    // returns a non-negative integer, termed a file descriptor.  It returns -1 on failure, and sets
+//    // errno to indicate the error return - value if failed
+//    // initialize superblock if it has never been initialized before
+//    disk = mmap(NULL, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+//    if (disk == MAP_FAILED) {
+//        perror("Couldn't map image");
+//        exit(1);
+//    }
     printf("in storage_init, mmaped the disk\n");
     superblock_init(disk);
 
