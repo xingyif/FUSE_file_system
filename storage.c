@@ -27,10 +27,10 @@ typedef struct file_data {
     const char *data;
 } file_data;
 const int DISK_SIZE = 1024 * 1024; // 1MB
-static void *disk = 0;
+void *disk;
 
 static int   pages_fd   = -1;
-//static void* pages_base =  0;
+static void* pages_base =  0;
 
 void
 storage_init(char *disk_image) {
@@ -42,8 +42,8 @@ storage_init(char *disk_image) {
     int rv = ftruncate(pages_fd, DISK_SIZE);
     assert(rv == 0);
 
-    disk = mmap(0, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, pages_fd, 0);
-    assert(disk != MAP_FAILED);
+    pages_base = mmap(0, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, pages_fd, 0);
+    assert(pages_base != MAP_FAILED);
 
 //    int fd;
 //    if ((fd = open(disk_image, O_CREAT | O_RDWR, 0644)) == -1) {
@@ -285,6 +285,6 @@ get_disk() {
 void
 storage_free()
 {
-    int rv = munmap(disk, DISK_SIZE);
+    int rv = munmap(pages_base, DISK_SIZE);
     assert(rv == 0);
 }
