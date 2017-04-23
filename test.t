@@ -136,7 +136,7 @@ write_text("40k.txt", $huge0);
 my $huge1 = read_text("40k.txt");
 ok($huge0 eq $huge1, "Read back 40k correctly.");
 
-my $huge2 = read_text_slice("40k.txt", 4010, 50);
+my $huge2 = read_text_slice("40k.txt", 10, 8050);
 $right = "ng is four";
 ok($huge2 eq $right, "Read with offset & length");
 

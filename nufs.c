@@ -63,7 +63,7 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
         return -ENOENT; // path doesn't exist
     }
     directory *cur_dir = single_iblock_addr(index);
-    for (int i = 0; i < cur_dir->number_of_entries; i++) {
+    for (int i = 0; i < 32; i++) {
         dir_ent cur_ent = cur_dir->entries[i];
 
         //offset += (i * sizeof(dir_ent));
