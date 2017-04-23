@@ -316,6 +316,11 @@ nufs_write(const char *path, const char *buf, size_t size, off_t offset, struct 
     return size;
 }
 
+int
+nufs_destroy() {
+    storage_free();
+}
+
 void
 nufs_init_ops(struct fuse_operations *ops) {
     memset(ops, 0, sizeof(struct fuse_operations));
@@ -332,6 +337,7 @@ nufs_init_ops(struct fuse_operations *ops) {
     ops->open = nufs_open;
     ops->read = nufs_read;
     ops->write = nufs_write;
+    ops->fusermount = nufs_destroy;
 };
 
 struct fuse_operations nufs_ops;
