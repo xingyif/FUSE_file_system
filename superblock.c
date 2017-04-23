@@ -9,6 +9,7 @@ static superblock *sprblk;
 
 void
 superblock_init(void *disk_img) {
+    // has_set_sprblk = 1;
     // offset for the superblock
     size_t offset = 0;
     // todo not sure if i need this

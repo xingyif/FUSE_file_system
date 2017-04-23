@@ -20,7 +20,7 @@
 
 const int DISK_SIZE = 1024 * 1024; // 1MB
 void *disk;
-
+static int has_set_sprblk = -1;
 static int   pages_fd   = -1;
 static void* pages_base = 0;
 
@@ -35,7 +35,9 @@ storage_init(char *disk_image) {
 
     pages_base = mmap(0, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, pages_fd, 0);
     assert(pages_base != MAP_FAILED);
-    superblock_init(disk);
+    if (has_set_sprblk == -1) {
+      has_set_sprblk = 1;
+      superblock_init(pages_base);
 
     // setting up inode_bitmap and iblock_bitmap
     for (int i = 0; i < 256; i++) {
@@ -63,6 +65,7 @@ storage_init(char *disk_image) {
 
     // update iblock bitmap
     iblock_bitmap_addr()[root_dir_idx] = 1;
+    }
 }
 
 int
@@ -219,7 +222,7 @@ get_data(char *path)
 
 void *
 get_disk() {
-    return disk;
+    return pages_base;
 }
 
 void
