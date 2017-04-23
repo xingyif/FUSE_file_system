@@ -21,5 +21,5 @@ int remove_dir_entry(char *path);
 int get_stat(char* path, struct stat* st);
 void* get_data(char* path);
 void* get_disk();
-
+void storage_free();
 #endif

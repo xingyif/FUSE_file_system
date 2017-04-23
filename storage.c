@@ -63,7 +63,7 @@ storage_init(char *disk_image) {
 //        perror("Couldn't map image");
 //        exit(1);
 //    }
-    printf("in storage_init, mmaped the disk\n");
+    printf("in storage_init, mmaped the disk\n");\
     superblock_init(disk);
 
 
@@ -280,4 +280,11 @@ get_data(char *path) // todo do we always assume the path is a file???????????? 
 void *
 get_disk() {
     return disk;
+}
+
+void
+storage_free()
+{
+    int rv = munmap(pages_base, DISK_SIZE);
+    assert(rv == 0);
 }
