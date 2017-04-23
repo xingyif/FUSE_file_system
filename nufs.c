@@ -25,8 +25,7 @@
 // Checks if a file exists.
 int
 nufs_access(const char *path, int mask) {
-    // todo doesn't differentiate owner, group, other, if not == user, return error
-    printf("access(%s, %04o)\n", path, mask); // debugging purpose
+    printf("access(%s, %04o)\n", path, mask);
     // checks if the path exists
     int index = get_entry_index(path);
     if (index < 0) {
@@ -36,22 +35,7 @@ nufs_access(const char *path, int mask) {
     // get current user id
     int cur_uid = getuid();
     inode *cur_inode = single_inode_addr(index);
-    // todo not checking permission for getting rid of the error
-    /* current user is not the owner
-    if (cur_inode->user_id != cur_uid) {
-        return -EACCES;
-    } // todo need to fix how these are being set for step 2 and supporting metadeta
-    // when cur_user == file owner
-    if (cur_inode->mode != mask) {
-        return -EACCES;
-    }*/
 
-    // Read, write, execute/search by owner
-
-    // check u_id? return -EACCESS if the requested permission isn't available
-//    struct stat* st;
-//    int rv = nufs_getattr(path, st);
-//    assert(rv == 0);
     return 0; // success
 }
 
@@ -60,7 +44,7 @@ nufs_access(const char *path, int mask) {
 int
 nufs_getattr(const char *path, struct stat *st) {
 
-    printf("In nufs_getattr(%s)\n", path); // debugging purpose
+    printf("In nufs_getattr(%s)\n", path);
     // get_stat will check if file/dir exist
     int rv = get_stat(path, st);
     printf("get_attr(%s) -> (%d) {mode: %04o, size: %d}\n", path, rv, st->st_mode, st->st_size);
@@ -72,15 +56,13 @@ nufs_getattr(const char *path, struct stat *st) {
 int
 nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
              off_t offset, struct fuse_file_info *fi) {
-printf("in nufs_readdir path: %s buf:%s offset: %d\n", path, buf, offset);
-    
+    printf("in nufs_readdir path: %s buf:%s offset: %d\n", path, buf, offset);
+
     int index = get_entry_index(path);
     if (index < 0) {
         return -ENOENT; // path doesn't exist
     }
-    //inode *cur_inode = single_inode_addr(index);
     directory *cur_dir = single_iblock_addr(index);
-printf("in nufs_readdir cur_dir name: %s\n", cur_dir->dir_name);
     for (int i = 0; i < cur_dir->number_of_entries; i++) {
         dir_ent cur_ent = cur_dir->entries[i];
 
@@ -89,32 +71,10 @@ printf("in nufs_readdir cur_dir name: %s\n", cur_dir->dir_name);
         if (cur_ent.filename == NULL) {
             continue;
         } else {
-/*
-	inode *cur_inode = single_inode_addr(cur_ent.entry_inode_index);
-printf("in nufs_readdir about to memset\n");
-	memset(st, 0, sizeof(struct stat));
-printf("in nufs_readdir1, found the entry(%s) in given dir(%s), return entry_index(%d)\n", cur_ent.filename, cur_dir->dir_name, i);
-        st->st_uid = cur_inode->user_id;
-    st->st_mode = cur_inode->mode;
-
-printf("in nufs_readdir2, found the entry(%s) in given dir(%s), return entry_index(%d)\n", cur_ent.filename, cur_dir->dir_name, i);
-    st->st_size = cur_inode->size_of;*/
-   filler(buf, cur_ent.filename, NULL, 0); 
-
-printf("in nufs_readdir3, found the entry(%s) in given dir(%s), return entry_index(%d)\n", cur_ent.filename, cur_dir->dir_name, i);
+            filler(buf, cur_ent.filename, NULL, 0);
             continue;
         }
     }
-    printf("readdir(%s)\n", path);
-
-    //   get_stat("/", &st);
-    // filler is a callback that adds one item to the result
-    // it will return non-zero when the buffer is full
-    // filler(buf, ".", &st, 0);
-
-//   get_stat("/hello.txt", &st);
-    // filler(buf, "hello.txt", &st, 0);
-    printf("made a hello.txt file\n");
     return 0;
 }
 
@@ -122,7 +82,6 @@ printf("in nufs_readdir3, found the entry(%s) in given dir(%s), return entry_ind
 // called for: man 2 open, man 2 link
 int
 nufs_mknod(const char *path, mode_t mode, dev_t rdev) {
-//    mode = 010064;   todo shouldn't be forcing this to be a file mode, trust fuse
     printf("in nufs_mknod:(%s, %04o)\n", path, mode);
     // checks if the path exists
     int index = get_entry_index(path);
@@ -130,14 +89,12 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev) {
         return -EEXIST; // path already exist
     }
 
-    printf("in nufs_mknod 1:(%s, %04o)\n", path, mode);
     int aval_idx = inode_bitmap_find_next_empty(inode_bitmap_addr());
     if (aval_idx < 0) {
         // ENOSPC: operation failed due to lack of disk space
         return aval_idx;
     }
 
-    printf("in nufs_mknod 2:(%s, %04o)\n", path, mode);
     // find the new inode ptr
     inode *cur_inode = single_inode_addr(aval_idx);
     // initialized inode and the inode struct is stored in disk
@@ -149,7 +106,6 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev) {
     // update the iblock_bitmap
     iblock_bitmap_addr()[aval_idx] = 1;
 
-    printf("in nufs_mknod 3:(%s, %04o)\n", path, mode);
     // create an entry and add the new entry to its own home dir
     int new_entry_idx = add_dir_entry(path, aval_idx);
     if (new_entry_idx < 0) {
@@ -157,7 +113,6 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev) {
         return new_entry_idx;
     }
 
-    printf("after mknod(%s, %04o)\n", path, mode);
     return 0; // success
 }
 
@@ -214,7 +169,7 @@ nufs_unlink(const char *path) {
         return -ENOENT; // path doesn't exist
     }
 
-    inode* cur_inode = single_inode_addr(index);
+    inode *cur_inode = single_inode_addr(index);
     // given path is a dir not a file
     if (!cur_inode->is_file) {
         return -EISDIR;
@@ -239,7 +194,7 @@ nufs_rmdir(const char *path) {
         return index; // ENOENT: path doesn't exist
     }
 
-    inode* cur_inode = single_inode_addr(index);
+    inode *cur_inode = single_inode_addr(index);
     // given path is a dir not a file
     if (cur_inode->is_file) {
         return -ENOTDIR; // given path is not dir
@@ -257,7 +212,6 @@ nufs_rmdir(const char *path) {
 // called to move a file within the same filesystem
 int
 nufs_rename(const char *from, const char *to) {
-    // todo should i call access
     printf("rename(%s => %s)\n", from, to);
     // checks if the path exists
     int from_index = get_entry_index(from);
@@ -266,13 +220,10 @@ nufs_rename(const char *from, const char *to) {
     }
 
     int to_index = get_entry_index(to);
-    // todo??? it is safe to inlcude 0=> root
     // if to exists, then remove it first
     if (to_index >= 0) {
 
     }
-
-
 
     // if two names are the same, do nothing
     if (strcmp(from, to) == 0) {
@@ -284,31 +235,27 @@ nufs_rename(const char *from, const char *to) {
 
     // create inode & iblock for to
     inode *to_inode = single_inode_addr(to_index);
-
-
     // both from and to must be the same type either file/dir
-
-
 //    EISDIR // new is a directory, but old is not a directory.
-//
-//    ENOTDIR // old is a directory, but new is not a directory.
-//    // if to exists, then it is removed/replaced
-//
-
-
-
+//    ENOTDIR // old is a directory, but new is not a directory
     return -1;
 }
 
 int
 nufs_chmod(const char *path, mode_t mode) {
     printf("chmod(%s, %04o)\n", path, mode);
+    int index = get_entry_index(path);
+    inode *from_inode = single_inode_addr(index);
+    iblock *from_iblock = single_iblock_addr(index);
     return -1;
 }
 
 int
 nufs_truncate(const char *path, off_t size) {
     printf("truncate(%s, %ld bytes)\n", path, size);
+    int index = get_entry_index(path);
+    inode *from_inode = single_inode_addr(index);
+    iblock *from_iblock = single_iblock_addr(index);
     return -1;
 }
 
@@ -324,12 +271,6 @@ nufs_open(const char *path, struct fuse_file_info *fi) {
     if (from_index < 0) {
         return -ENOENT; // path doesn't exist
     }
-    // todo do i need to check for read only???????????????????????????????????????????????????????????
-    /* checks if it is read only
-    if ((fi->flags & 3) != O_RDONLY) {
-        return -EACCES; // no access to file
-    }*/
-
     return 0;
 }
 
@@ -345,29 +286,12 @@ nufs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_fi
     }
 
     // data can be file contents or directory contents
-//    void *data = get_data(path);
-
     iblock *cur_iblock = single_iblock_addr(index);
     if (offset + size > 4096) {
         return -ENOENT;
     }
- size = size - offset;
-//pread(fi->fh, buf, size,offset);
-    /*
-    int len = strlen(data) + 1;
-    if (size < len) {
-        len = size;
-    }*/
-/* todo doesn't work
-    char *new_blk;
-    for (int position = offset; position < offset + size;) {
-        memmove(buf, new_blk + position % 4096, 4096 - position % 4096);
-    } */
-
-memcpy(buf, cur_iblock + offset, size);
-
-printf("in read after memcpy buf: %s\n", buf);
-
+    size = size - offset;
+    memcpy(buf, cur_iblock + offset, size);
     return strlen(buf);
 }
 
@@ -375,26 +299,20 @@ printf("in read after memcpy buf: %s\n", buf);
 int
 nufs_write(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
     printf("write(%s, %d bytes, @%d, %s buf)\n", path, size, offset, buf);
-// get iblock index for this path
+    // get iblock index for this path
     int index = get_entry_index(path);
     if (index < 0) {
-return -EISDIR;
-}
-// get block with the index
+        return -EISDIR;
+    }
+    // get block with the index
     iblock *cur_block = single_iblock_addr(index);
     if (offset + size > 4096) {
         return -ENOENT;
     }
-//pwrite(fi->fh,buf,size,offset);
-/* doesn't work
-    char *new_blk;
-for (int position = offset; position < offset + size;) {  
-        memmove(new_blk + position % 4096, buf, 4096 - position % 4096);
-    }*/
-	memcpy(cur_block + offset, buf, size);
-printf("in write afte memcpy at cur_block: %s\n", cur_block);
-inode *cur_inode = single_inode_addr(index);
-cur_inode->size_of = size;
+    memcpy(cur_block + offset, buf, size);
+    printf("in write afte memcpy at cur_block: %s\n", cur_block);
+    inode *cur_inode = single_inode_addr(index);
+    cur_inode->size_of = size;
     return size;
 }
 
@@ -421,9 +339,7 @@ struct fuse_operations nufs_ops;
 int
 main(int argc, char *argv[]) {
     assert(argc > 2);
-//	slist* path = split(argv[--argc]); - also call util function 
     storage_init(argv[--argc]); // disk_image
-//   superblock_add_inode(argv[--argc]);
     nufs_init_ops(&nufs_ops);
     // mount happened magically in fuse_main
     return fuse_main(argc, argv, &nufs_ops, NULL);

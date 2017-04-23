@@ -10,8 +10,8 @@ typedef struct inode {
     int xtra; // more stuff can go here
 } pnode;
 */
-void   pages_init(const char* path);
-void   pages_free();
+//void   pages_init(const char* path);
+//void   pages_free();
 /*void*  pages_get_page(int pnum);
 inode* pages_get_node(int node_id);
 int    pages_find_empty();
