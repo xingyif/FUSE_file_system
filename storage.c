@@ -19,9 +19,10 @@
 #include "slist.h"
 
 const int DISK_SIZE = 1024 * 1024; // 1MB
-static void *disk = 0;
+void *disk;
 
 static int   pages_fd   = -1;
+static void* pages_base = 0;
 
 void
 storage_init(char *disk_image) {
@@ -32,8 +33,8 @@ storage_init(char *disk_image) {
     int rv = ftruncate(pages_fd, DISK_SIZE);
     assert(rv == 0);
 
-    disk = mmap(0, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, pages_fd, 0);
-    assert(disk != MAP_FAILED);
+    pages_base = mmap(0, DISK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, pages_fd, 0);
+    assert(pages_base != MAP_FAILED);
     superblock_init(disk);
 
     // setting up inode_bitmap and iblock_bitmap
@@ -224,6 +225,6 @@ get_disk() {
 void
 storage_free()
 {
-    int rv = munmap(disk, DISK_SIZE);
+    int rv = munmap(pages_base, DISK_SIZE);
     assert(rv == 0);
 }

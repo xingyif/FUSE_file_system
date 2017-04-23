@@ -1,0 +1,20 @@
+make[1]: Entering directory '/home/yifan/Documents/hw12-FUSE-File-System'
+mkdir -p mnt || true
+./nufs -s -f mnt data.nufs
+Makefile:20: recipe for target 'mount' failed
+make[1]: *** [mount] Segmentation fault (core dumped)
+make[1]: Leaving directory '/home/yifan/Documents/hw12-FUSE-File-System'
+make[1]: Entering directory '/home/yifan/Documents/hw12-FUSE-File-System'
+fusermount -u mnt || true
+fusermount: entry for /home/yifan/Documents/hw12-FUSE-File-System/mnt not found in /etc/mtab
+make[1]: Leaving directory '/home/yifan/Documents/hw12-FUSE-File-System'
+make[1]: Entering directory '/home/yifan/Documents/hw12-FUSE-File-System'
+mkdir -p mnt || true
+./nufs -s -f mnt data.nufs
+Makefile:20: recipe for target 'mount' failed
+make[1]: *** [mount] Segmentation fault (core dumped)
+make[1]: Leaving directory '/home/yifan/Documents/hw12-FUSE-File-System'
+make[1]: Entering directory '/home/yifan/Documents/hw12-FUSE-File-System'
+fusermount -u mnt || true
+fusermount: entry for /home/yifan/Documents/hw12-FUSE-File-System/mnt not found in /etc/mtab
+make[1]: Leaving directory '/home/yifan/Documents/hw12-FUSE-File-System'
