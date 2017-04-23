@@ -11,6 +11,12 @@ s_cons(const char* text, slist* rest)
     xs->data = strdup(text);
     xs->refs = 1;
     xs->next = rest;
+    if (xs->next == NULL) {
+   	xs->index = 1;
+    }
+    else {
+	xs->index = xs->next->index + 1;
+    }
     return xs;
 }
 
@@ -38,6 +44,7 @@ s_split(const char* text, char delim)
     }
 
     int plen = 0;
+
     while (text[plen] != 0 && text[plen] != delim) {
         plen += 1;
     }
@@ -53,5 +60,13 @@ s_split(const char* text, char delim)
     part[plen] = 0;
 
     return s_cons(part, rest);
+}
+
+slist*
+slist_last(slist *list) {
+    while(list->next != NULL) {
+        list = list->next;
+}
+    return list;
 }
 

@@ -13,9 +13,10 @@
 
 #include "pages.h"
 #include "slist.h"
-#include "util.h"
+//#include "util.h"
+#include "superblock.h"
 
-const int NUFS_SIZE  = 1024 * 1024; // 1MB
+//const int NUFS_SIZE  = 1024 * 1024; // 1MB
 const int PAGE_COUNT = 256;
 
 static int   pages_fd   = -1;
@@ -27,20 +28,21 @@ pages_init(const char* path)
     pages_fd = open(path, O_CREAT | O_RDWR, 0644);
     assert(pages_fd != -1);
 
-    int rv = ftruncate(pages_fd, NUFS_SIZE);
+    int rv = ftruncate(pages_fd, 1024*1024);
     assert(rv == 0);
 
-    pages_base = mmap(0, NUFS_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, pages_fd, 0);
+    pages_base = mmap(0, 1024*1024, PROT_READ | PROT_WRITE, MAP_SHARED, pages_fd, 0);
     assert(pages_base != MAP_FAILED);
+    superblock_init(pages_base);
 }
 
 void
 pages_free()
 {
-    int rv = munmap(pages_base, NUFS_SIZE);
+    int rv = munmap(pages_base, 1024*1024);
     assert(rv == 0);
 }
-
+/*
 void*
 pages_get_page(int pnum)
 {
@@ -79,4 +81,4 @@ print_node(pnode* node)
     }
 }
 
-
+*/

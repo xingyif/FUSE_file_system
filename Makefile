@@ -4,7 +4,7 @@ OBJS := $(SRCS:.c=.o)
 HDRS := $(wildcard *.h)
 
 CFLAGS := -std=c11 -g `pkg-config fuse --cflags`
-LDLIBS := `pkg-config fuse --libs` 
+LDLIBS := `pkg-config fuse --libs libbsd` -lbsd
 
 nufs: $(OBJS)
 	gcc $(CLFAGS) -o $@ $^ $(LDLIBS)
@@ -28,7 +28,7 @@ test: nufs
 
 gdb: nufs
 	mkdir -p mnt || true
-	gdb --args ./nufs -f mnt data.nufs
+	gdb --args ./nufs -s -f mnt data.nufs
 
 .PHONY: clean mount unmount gdb
 

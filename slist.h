@@ -5,11 +5,13 @@ typedef struct slist {
     char* data;
     int   refs;
     struct slist* next;
+    int index;
 } slist;
 
 slist* s_cons(const char* text, slist* rest);
 void   s_free(slist* xs);
 slist* s_split(const char* text, char delim);
 
+slist* slist_last(slist *list);
 #endif
 

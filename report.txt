@@ -1,3 +1,12 @@
 hw 12
 
-brett is setting up git on ubuntu
+read/write doesn't work
+
+get adir
+make node
+
+echo "hello" > hello.txt
+
+
+ssh -i "hw12-yifan.pem" ubuntu@ec2-54-237-221-205.compute-1.amazonaws.com
+
