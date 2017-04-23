@@ -1,12 +1,60 @@
 hw 12
+Yifan Xing & Brett Krutiansky
+Submission is identical to partner's submission.
 
-read/write doesn't work
+The advantage to building your file system, like the one we did on this homework,
+is the flexibility to tailor the file system to your needs. It is like building a
+Swiss army knife tailored to your needs. Another advantage is that any user can
+load and mount their own file system. This is a handy and needed trick for when
+dealing with multiple users across a network. The ability to load and mount your
+own file system is handy when dealing with personal media files that a user can
+choose to keep or remove at their leisure. Also, if a fuse filesystem crashes
+it won’t affect your kernel. And it can be programmed and deployed quickly giving
+a user maximum efficiency.
 
-get adir
-make node
+That being said, the amount of time and energy to develop your own fuse file system,
+can be a little bit cumbersome if one doesn’t know where to begin. Sure, there are many
+tutorials, but none of them truly hold your hand throughout the process. Another issue
+similar to this is that a certain level of expertise is required to build your own file
+system.  Even though this process is usually only done by those familiar with the process,
+many people could benefit from knowing how to build and tailor their own file system if
+they knew how. And from a technical perspective there are disadvantages with speed
+(kernel is faster), more robust (kernel file systems tend to handle higher workloads),
+and a kernel file system can be used on boot-up unlike a FUSE filesystem.
 
-echo "hello" > hello.txt
+If we have more time we would have made our filesystem more robust by being able to
+properly read and write large files as well as handle permissions. Currently our
+implementation isn’t very “secure” as any user who has access to the file system
+could potentially access any file on the system. While, on a local gapped machine
+this wouldn’t be a huge issue, when it comes to shared computers, or machines on a
+network, this feature is paramount.
 
+Together we completed most of (if not all) the step one functionality required
+by this assignment.
+ Create files.
+ List the files in the filesystem root directory (where you mounted it).
+ Write to small files (under 4k).
+ Read from small files (under 4k).
+ Delete files.
+ Rename files.
+ Read and write from files larger than one block.
+ Create directories and nested directories.
+ Remove directories.
+ Support metadata for files and directories.
 
-ssh -i "hw12-yifan.pem" ubuntu@ec2-54-237-221-205.compute-1.amazonaws.com
+We are currently missing the functionality with some of the
+given functions like “chmod”, if we had more time we believe we would have been
+able to successfully implement this feature. We didn't implement any additional
+feature that wasn't required.
 
+All in all, this was a great project that truly made us think and gave us fun
+problems to solve. It made us appreciate all the work that comes with developing
+file systems, as well as understand how hard it is to build a proper file system
+across a network like the one used by systems. It also made us realize how vulnerable
+the cloud truly is. Too often people “put it to the cloud” without regard for security
+or not even realizing how many people can access their files. If someone has access to
+the machine in the warehouse that person has access to the personal files on that machine.
+
+That’s what made this assignment great, it had many fun problems (from design to implementation)
+and it made us learn about the multiple problems and solutions that come with building
+your own FUSE file system.
