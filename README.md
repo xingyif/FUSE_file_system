@@ -1,12 +1,5 @@
 # FUSE_File_System
 
-Wait...till I finish
-
-80% there
-.
-.
-.
-
 
 >  This file system is a **FUSE filesystem driver** that will let you mount a **1MB** disk image (data file) as a filesystem.
 >  This file system uses **FUSE** library and tools. Runnable on **Ubuntu 16.04 system** (which has FUSE version 2.6).
